@@ -1,15 +1,21 @@
-import { formatDate } from '../../utils/formatters'
+import { formatDate } from "../../utils/formatters";
 
 const notificationTypeLabel = (type) => {
   switch (type) {
-    case 'PAYMENT': return '결제'
-    case 'OFFER': return '입찰'
-    case 'OFFER_ACCEPTED': return '선택됨'
-    case 'OFFER_REJECTED': return '미선택'
-    case 'BLOCK': return '차단'
-    default: return '알림'
+    case "PAYMENT":
+      return "결제";
+    case "OFFER":
+      return "입찰";
+    case "OFFER_ACCEPTED":
+      return "선택됨";
+    case "OFFER_REJECTED":
+      return "미선택";
+    case "BLOCK":
+      return "차단";
+    default:
+      return "알림";
   }
-}
+};
 
 export default function NotificationPanel({
   open,
@@ -19,19 +25,22 @@ export default function NotificationPanel({
   onOpenLink,
   onOpenNotificationsPage,
 }) {
-  if (!open) return null
+  if (!open) return null;
 
-  const items = (summary?.items || []).filter((item) => !item.isRead)
+  const items = (summary?.items || []).filter((item) => !item.isRead);
 
   const handleClose = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    onClose?.()
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    onClose?.();
+  };
 
   return (
     <div className="chat-inbox-backdrop" onClick={onClose}>
-      <aside className="chat-inbox-panel notification-panel" onClick={(e) => e.stopPropagation()}>
+      <aside
+        className="chat-inbox-panel notification-panel"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="chat-inbox-panel__head">
           <div className="chat-inbox-panel__titleWrap">
             <strong>알림</strong>
@@ -60,9 +69,11 @@ export default function NotificationPanel({
                 onClick={() => onOpenLink?.(item)}
               >
                 <div className="notification-item__top">
-                  <span className="notification-item__type">{notificationTypeLabel(item.type)}</span>
+                  <span className="notification-item__type">
+                    {notificationTypeLabel(item.type)}
+                  </span>
                   <span className="notification-item__date">
-                    {item.createdAt ? formatDate(item.createdAt) : ''}
+                    {item.createdAt ? formatDate(item.createdAt) : ""}
                   </span>
                 </div>
                 <strong>{item.title}</strong>
@@ -93,5 +104,5 @@ export default function NotificationPanel({
         </div>
       </aside>
     </div>
-  )
+  );
 }
