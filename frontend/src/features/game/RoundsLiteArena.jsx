@@ -130,8 +130,11 @@ export default function RoundsLiteArena({ controller }) {
   const pendingPickerSeats = useMemo(() => parsePickerSeats(room?.pickerSeat), [room?.pickerSeat])
   const cardPickKey = room?.roomCode && room?.roundNo && room?.mySeat ? `${room.roomCode}:${room.roundNo}:${room.mySeat}` : ''
   const hasSubmittedCardPick = Boolean(cardPickKey && submittedCardPickKey === cardPickKey)
-  const isPicker = !hasSubmittedCardPick && Boolean(room?.myCardPickPending || me?.cardPickPending || (!!room?.mySeat && pendingPickerSeats.includes(room.mySeat)))
-  const waitingForCardPick = room?.phase === 'CARD_PICK' && (!isPicker || hasSubmittedCardPick)
+  const myServerCardPickPending = Boolean(room?.myCardPickPending || me?.cardPickPending || (!!room?.mySeat && pendingPickerSeats.includes(room.mySeat)))
+  const hasAnyServerCardPickPending = Boolean(pendingPickerSeats.length > 0 || room?.players?.some((player) => player.cardPickPending))
+  const isPicker = room?.phase === 'CARD_PICK' && myServerCardPickPending && !hasSubmittedCardPick
+  const waitingForCardPick = room?.phase === 'CARD_PICK' && hasAnyServerCardPickPending && !isPicker
+  const shouldShowCardPickOverlay = room?.phase === 'CARD_PICK' && (isPicker || waitingForCardPick)
 
   useEffect(() => {
     const viewport = arenaViewportRef.current
@@ -167,6 +170,12 @@ export default function RoundsLiteArena({ controller }) {
 
     setDisplayRoom((previous) => blendVisualRoom(previous, room))
   }, [room])
+
+  useEffect(() => {
+    if (room?.phase !== 'CARD_PICK') {
+      setSubmittedCardPickKey('')
+    }
+  }, [room?.phase, room?.roomCode])
 
   useEffect(() => {
     const savedRoom = localStorage.getItem(LAST_ROOM_KEY)
@@ -657,10 +666,10 @@ export default function RoundsLiteArena({ controller }) {
                   </div>
                 )}
 
-                {room?.phase === 'CARD_PICK' && (
+                {shouldShowCardPickOverlay && (
                   <div className="rounds-lite-overlay rounds-lite-overlay--cards">
                     <h3>{isPicker ? '능력 카드 1장을 선택하세요' : '상대의 카드 선택을 기다리는 중입니다'}</h3>
-                    {waitingForCardPick && <p className="rounds-lite-overlay-note">내 선택은 완료됐습니다. 상대의 선택을 기다려 주세요.</p>}
+                    {waitingForCardPick && hasSubmittedCardPick && <p className="rounds-lite-overlay-note">내 선택은 완료됐습니다. 상대의 선택을 기다려 주세요.</p>}
                     {isPicker && (
                       <div className="rounds-lite-card-options">
                         {room.cardOptions?.map((card, index) => (
