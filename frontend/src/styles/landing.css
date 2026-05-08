@@ -42,8 +42,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  /* 추가 */
-  min-width: 0;
 }
 
 .landing-brand {
@@ -298,24 +296,7 @@ body.theme-admin .app-logo__image {
 
 .landing-nav {
   gap: 12px;
-  /* 추가 */
-  justify-content: center;
-  flex-wrap: nowrap;
-  min-width: 0;
-  flex: 1;
 }
-
-/* 추가 */
-.landing-brand,
-.landing-header__actions {
-  flex: 0 0 auto;
-}
-
-/* 추가 */
-.landing-header__actions {
-  justify-content: flex-end;
-}
-
 
 .landing-header__actions {
   gap: 10px;
@@ -444,8 +425,7 @@ body.theme-admin .app-logo__image {
   position: relative;
   z-index: 1;
   display: grid;
-  /* grid-template-columns: 1.1fr 0.9fr; */
-  grid-template-columns: 0.9fr 1.2fr;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: clamp(28px, 4vw, 56px);
   align-items: center;
   /* min-height: calc(82vh - 84px); */
@@ -546,7 +526,7 @@ body.theme-admin .app-logo__image {
   color: var(--text-strong);
 }
 
-/* .landing-visualCard {
+.landing-visualCard {
   position: relative;
   min-height: 560px;
   border-radius: 40px;
@@ -555,22 +535,6 @@ body.theme-admin .app-logo__image {
       rgba(255, 255, 255, 0.8),
       rgba(241, 245, 249, 0.68) 56%,
       rgba(226, 232, 240, 0.36) 100%);
-} */
-
-
-.landing-visualCard {
-  position: relative;
-  height: 560px;
-  border-radius: 40px;
-  overflow: hidden;
-}
-
-/* 추가 */
-.landing-visualImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
 }
 
 .landing-visualCard__glow {
@@ -760,15 +724,6 @@ body.theme-admin .app-logo__image {
   color: var(--text-sub);
   font-size: 17px;
   line-height: 1.8;
-}
-
-/* 추가 */
-.landing-sectionHead.public-directory-hero__head {
-  width: 100%;
-  max-width: none;
-  align-items: flex-start !important;
-  text-align: left !important;
-  padding-left: 0 !important;
 }
 
 .landing-solutionGrid {
@@ -1161,25 +1116,14 @@ body.theme-admin .app-logo__image {
     min-height: auto;
     padding-top: 16px;
     padding-bottom: 16px;
-    /* flex-wrap: wrap; */
-    flex-wrap: nowrap;
-    /* 추가 */
-    gap: 12px;
+    flex-wrap: wrap;
   }
 
-  /* .landing-nav {
+  .landing-nav {
     order: 3;
     width: 100%;
     overflow-x: auto;
     padding-bottom: 2px;
-  } */
-  .landing-nav {
-    flex: 1;
-    min-width: 0;
-    justify-content: center;
-    padding-bottom: 0;
-    order: 0;
-    width: auto;
   }
 
   .landing-hero {
@@ -1211,12 +1155,6 @@ body.theme-admin .app-logo__image {
     gap: 16px;
     align-items: start;
   }
-
-  /* 추가 */
-  .landing-header__actions {
-    margin-left: 0;
-    flex-shrink: 0;
-  }
 }
 
 @media (max-width: 640px) {
@@ -1244,20 +1182,10 @@ body.theme-admin .app-logo__image {
     flex-wrap: wrap;
   }
 
-  /* .landing-btn,
+  .landing-btn,
   .landing-text-btn,
   .landing-nav button {
     width: 100%;
-  } */
-  .landing-text-btn,
-  .landing-nav button {
-    width: auto;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .landing-header__actions .landing-btn {
-    width: auto;
   }
 
   .landing-boardTable {
@@ -1572,52 +1500,6 @@ body.theme-admin .app-logo__image {
   .public-directory-card__summaryStats strong {
     font-size: 14px;
   }
-
-  /* 추가 */
-  .landing-header__inner {
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-  }
-
-  /* 추가 */
-  .landing-brand {
-    flex: 1;
-  }
-
-  /* 추가 */
-  .landing-nav {
-    order: 3;
-    flex: none;
-    width: 100%;
-    min-width: 100%;
-    display: flex;
-    justify-content: space-between;
-    gap: 0;
-    flex-wrap: nowrap;
-    overflow: visible;
-    padding-top: 4px;
-  }
-
-  /* 추가 */
-  .landing-nav button {
-    padding: 10px 4px;
-    font-size: 13px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  /* 추가 */
-  .landing-header__actions {
-    width: auto;
-    flex-shrink: 0;
-  }
-
-  .landing-header__actions .landing-btn {
-    height: 40px;
-    padding: 0 14px;
-    font-size: 13px;
-  }
 }
 
 .public-directory-card__head {
@@ -1759,7 +1641,6 @@ body.theme-admin .app-logo__image {
 .profile-preview-box .public-directory-card {
   margin-top: 18px;
 }
-
 /* 실시간 배차 상태 목록 페이징 */
 .landing-boardPagination {
   display: flex;

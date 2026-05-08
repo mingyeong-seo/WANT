@@ -15,7 +15,7 @@ public interface RoundsLiteRoomRepository extends JpaRepository<RoundsLiteRoom, 
     Optional<RoundsLiteRoom> findByRoomCode(String roomCode);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select r from RoundsLiteRoom r where r.roomCode = :roomCode")
+    @Query("select distinct r from RoundsLiteRoom r left join fetch r.players where r.roomCode = :roomCode")
     Optional<RoundsLiteRoom> findByRoomCodeForUpdate(@Param("roomCode") String roomCode);
 
     List<RoundsLiteRoom> findByMatchmakingRoomTrueOrderByCreatedAtAsc();

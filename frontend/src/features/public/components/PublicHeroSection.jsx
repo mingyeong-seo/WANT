@@ -1,5 +1,4 @@
 import AppLogo from '../../../components/common/AppLogo'
-import mainImage from '../../../assets/main.png'
 import { roleText } from '../../../utils/formatters'
 
 function LoggedInPanel({ auth, message, openDashboard, logout }) {
@@ -124,7 +123,7 @@ export default function PublicHeroSection({ controller }) {
 
           </div>
 
-          {/* <div className="landing-hero__visual" data-reveal>
+          <div className="landing-hero__visual" data-reveal>
             <div className="landing-visualCard">
               <div className="landing-visualCard__glow landing-visualCard__glow--blue" />
               <div className="landing-visualCard__glow landing-visualCard__glow--violet" />
@@ -143,15 +142,6 @@ export default function PublicHeroSection({ controller }) {
               <div className="landing-visualCard__shield">
                 <div className="landing-visualCard__shieldCore landing-visualCard__shieldCore--logo"><AppLogo title="want" subtitle="" hideText /></div>
               </div>
-            </div>
-          </div> */}
-          <div className="landing-hero__visual" data-reveal>
-            <div className="landing-visualCard">
-              <img
-                src={mainImage}
-                alt="메인 비주얼"
-                className="landing-visualImage"
-              />
             </div>
           </div>
         </div>

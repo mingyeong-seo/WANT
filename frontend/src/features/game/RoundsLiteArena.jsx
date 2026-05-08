@@ -128,21 +128,15 @@ export default function RoundsLiteArena({ controller }) {
     [room]
   )
   const pendingPickerSeats = useMemo(() => parsePickerSeats(room?.pickerSeat), [room?.pickerSeat])
-  const isPicker = Boolean(room?.myCardPickPending || me?.cardPickPending || (!!room?.mySeat && pendingPickerSeats.includes(room.mySeat)))
-  const cardPickKey = room?.phase === 'CARD_PICK' && room?.roomCode && room?.mySeat
+  const cardPickKey = room?.roomCode && room?.roundNo && room?.mySeat
     ? `${room.roomCode}:${room.roundNo}:${room.mySeat}`
     : ''
-  const hasSubmittedCardPick = Boolean(cardPickKey && submittedCardPickKey === cardPickKey)
-  const canSelectCardNow = room?.phase === 'CARD_PICK' && isPicker && !hasSubmittedCardPick
-  const waitingForCardPick = room?.phase === 'CARD_PICK' && (!isPicker || hasSubmittedCardPick)
-
-
-  useEffect(() => {
-    if (room?.phase !== 'CARD_PICK') {
-      setSubmittedCardPickKey('')
-      cardSelectLockRef.current = false
-    }
-  }, [room?.phase, room?.roundNo, room?.roomCode])
+  const hasSubmittedCardPick = room?.phase === 'CARD_PICK' && !!cardPickKey && submittedCardPickKey === cardPickKey
+  const isPicker = Boolean(
+    !hasSubmittedCardPick &&
+    (room?.myCardPickPending || me?.cardPickPending || (!!room?.mySeat && pendingPickerSeats.includes(room.mySeat)))
+  )
+  const waitingForCardPick = room?.phase === 'CARD_PICK' && (hasSubmittedCardPick || !isPicker)
 
   useEffect(() => {
     const viewport = arenaViewportRef.current
@@ -200,6 +194,12 @@ export default function RoundsLiteArena({ controller }) {
     startLoops(room.roomCode)
     return () => stopLoops()
   }, [room?.roomCode])
+
+  useEffect(() => {
+    if (room?.phase !== 'CARD_PICK') {
+      setSubmittedCardPickKey('')
+    }
+  }, [room?.phase, room?.roundNo, room?.roomCode])
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -297,7 +297,7 @@ export default function RoundsLiteArena({ controller }) {
       if (!silent) {
         setError(getErrorMessage(fetchError, '게임 상태를 불러오지 못했습니다.'))
       }
-      return null
+      throw fetchError
     }
   }
 
@@ -419,13 +419,19 @@ export default function RoundsLiteArena({ controller }) {
 
     const currentMe = current.players?.find((player) => player.seat === current.mySeat)
     const pendingSeats = parsePickerSeats(current.pickerSeat)
-    const canPickCard = Boolean(current.myCardPickPending || currentMe?.cardPickPending || pendingSeats.includes(current.mySeat))
-    const currentPickKey = `${current.roomCode}:${current.roundNo}:${current.mySeat}`
-    if (!canPickCard || cardSelectLockRef.current || submittedCardPickKey === currentPickKey) return
+    const currentPickKey = current.roomCode && current.roundNo && current.mySeat
+      ? `${current.roomCode}:${current.roundNo}:${current.mySeat}`
+      : ''
+    const alreadySubmitted = currentPickKey && submittedCardPickKey === currentPickKey
+    const canPickCard = Boolean(
+      !alreadySubmitted &&
+      (current.myCardPickPending || currentMe?.cardPickPending || pendingSeats.includes(current.mySeat))
+    )
+    if (!canPickCard || cardSelectLockRef.current) return
 
     cardSelectLockRef.current = true
-    setSubmittedCardPickKey(currentPickKey)
     actionInFlightRef.current = true
+    setSubmittedCardPickKey(currentPickKey)
     setLoading(true)
     setError('')
 
@@ -670,24 +676,22 @@ export default function RoundsLiteArena({ controller }) {
 
                 {room?.phase === 'CARD_PICK' && (
                   <div className="rounds-lite-overlay rounds-lite-overlay--cards">
-                    <h3>{canSelectCardNow ? '능력 카드 1장을 선택하세요' : '상대의 카드 선택을 기다리는 중입니다'}</h3>
+                    <h3>{isPicker ? '능력 카드 1장을 선택하세요' : '상대의 카드 선택을 기다리는 중입니다'}</h3>
                     {waitingForCardPick && <p className="rounds-lite-overlay-note">내 선택은 완료됐습니다. 상대의 선택을 기다려 주세요.</p>}
-                    {canSelectCardNow && (
-                      <div className="rounds-lite-card-options">
-                        {room.cardOptions?.map((card) => (
-                          <button
-                            key={card.key}
-                            type="button"
-                            className="rounds-lite-upgrade-card"
-                            onClick={() => handleSelectCard(card.key)}
-                            disabled={!canSelectCardNow || loading || cardSelectLockRef.current}
-                          >
-                            <strong>{card.title}</strong>
-                            <span>{card.description}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    <div className="rounds-lite-card-options">
+                      {room.cardOptions?.map((card) => (
+                        <button
+                          key={card.key}
+                          type="button"
+                          className="rounds-lite-upgrade-card"
+                          onClick={() => handleSelectCard(card.key)}
+                          disabled={!isPicker || loading}
+                        >
+                          <strong>{card.title}</strong>
+                          <span>{card.description}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
 

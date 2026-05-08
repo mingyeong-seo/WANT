@@ -27,7 +27,6 @@ import ReceiptPdfBridge from "./components/common/ReceiptPdfBridge";
 import QuoteDetailPage from "./features/public/QuoteDetailPage";
 // 추가
 import React, { useEffect } from "react";
-import PublicFooter from "./features/public/components/publicFooter/PublicFooter";
 
 export default function App() {
   const controller = useLogisticsController();
@@ -185,7 +184,6 @@ export default function App() {
       ) : (
         <ScrollTopFloatingButton compact />
       )}
-      {controller.routePage !== "dashboard" && <PublicFooter />}
     </>
   );
 }

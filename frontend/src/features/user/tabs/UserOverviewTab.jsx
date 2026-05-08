@@ -520,7 +520,7 @@ export default function UserOverviewTab({ controller }) {
         <div className="surface profile-edit-surface">
           <SectionTitle
             title="관심 견적"
-            desc="최근 등록한 관심 견적을 최신순으로 확인해보세요."
+            desc="최신순"
           />
           <div className="list-stack">
             {bookmarks.length ? (

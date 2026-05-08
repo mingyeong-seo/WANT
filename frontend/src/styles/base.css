@@ -192,13 +192,6 @@ textarea {
   overflow: hidden;
 }
 
-/* 추가 */
-.empty-row td {
-  height: 67px;
-  border-bottom: none !important;
-  background: transparent;
-}
-
 /* 테이블 위 간격 */
 /* 추가 */
 .table-surface .board-table {

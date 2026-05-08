@@ -42,8 +42,6 @@ export default function PublicBoardSection({ controller }) {
     setBoardPage(Math.min(Math.max(nextPage, 1), boardTotalPages))
   }
 
-  const emptyRows = BOARD_PAGE_SIZE - pagedPublicBoard.length
-
   return (
     <section className="landing-board" id="board">
       <div className="landing-board__inner">
@@ -90,12 +88,6 @@ export default function PublicBoardSection({ controller }) {
                     <td>{item.offerCount}건 / {formatCurrency(item.bestOfferPrice)}</td>
                     {/* <td>{item.estimatedMinutes}분</td> */}
                     <td>{formatMinutesToHourMinute(item.estimatedMinutes)}</td>
-                  </tr>
-                ))}
-
-                {Array.from({ length: emptyRows }).map((_, index) => (
-                  <tr key={`empty-${index}`} className="empty-row">
-                    <td colSpan={7}></td>
                   </tr>
                 ))}
               </tbody>

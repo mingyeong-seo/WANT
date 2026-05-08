@@ -69,15 +69,16 @@ export default function PublicUserSearchPage({ controller, role }) {
 
       <section className="landing-info public-directory-hero">
         <div className="landing-info__inner">
-          <div className="landing-sectionHead public-directory-hero__head">
+          <div className="landing-sectionHead">
             <span>{isDriver ? "DRIVER DIRECTORY" : "SHIPPER DIRECTORY"}</span>
             <h2>
               {isDriver
-                ? "차주 찾기"
-                : "화주 찾기"}
+                ? "가입된 차주를 한 번에 보고 이름으로 바로 찾을 수 있습니다."
+                : "가입된 화주를 한 번에 보고 이름으로 바로 찾을 수 있습니다."}
             </h2>
             <p>
-              가입된 화주와 차주를 한 번에 확인하고 원하는 상대를 빠르게 찾을 수 있습니다.
+              헤더는 그대로 유지하고, 아래 탭에서 화주와 차주를 바로 전환할 수
+              있도록 구성했습니다.
             </p>
           </div>
 
