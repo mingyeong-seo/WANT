@@ -56,16 +56,6 @@ export default function ChatFloatingButton({
           <span className="floating-quick-menu__action-label">AI</span>
         </button>
 
-        {/* 게임 */}
-        <button
-          className="floating-quick-menu__action floating-quick-menu__action--game"
-          type="button"
-          onClick={() => handleAction(onGameClick, "game")}
-          aria-label="게임 열기"
-        >
-          <span className="floating-quick-menu__action-label">게임</span>
-        </button>
-
         {/* 알림 */}
         <button
           className="floating-quick-menu__action floating-quick-menu__action--notification"
