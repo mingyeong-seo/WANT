@@ -700,13 +700,25 @@ public class RoundsLiteService {
                 .orElseThrow(() -> new RuntimeException("승자 정보를 찾을 수 없습니다."));
         winner.setWins(winner.getWins() + 1);
         room.setRoundWinnerSeat(winnerSeat);
+        room.setProjectilesJson("[]");
+
+        int targetWins = room.getTargetWins() != null ? room.getTargetWins() : TARGET_WINS;
+        if (winner.getWins() >= targetWins) {
+            room.setPhase("MATCH_END");
+            room.setMatchWinnerSeat(winnerSeat);
+            room.setPickerSeat(null);
+            room.setCardOptionsJson("[]");
+            room.setCountdownEndsAt(null);
+            room.setMessage(winner.getName() + " 님이 " + targetWins + "승을 달성해 매치에서 승리했습니다.");
+            return;
+        }
 
         room.setPhase("CARD_PICK");
+        room.setMatchWinnerSeat(null);
         room.setPickerSeat(writeSeatSet(room.getPlayers().stream()
                 .map(RoundsLitePlayer::getSeat)
                 .collect(Collectors.toCollection(LinkedHashSet::new))));
         room.setCardOptionsJson(writeJson(drawCards()));
-        room.setProjectilesJson("[]");
         room.setMessage(winner.getName() + " 님이 라운드에서 승리했습니다. 양쪽 플레이어 모두 능력 카드 1장을 선택하세요.");
     }
 
