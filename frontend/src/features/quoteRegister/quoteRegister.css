@@ -1728,10 +1728,6 @@
   color: #64748b;
 }
 
-.custom-check-text {
-  margin-left: 5px;
-}
-
 @media (max-width: 1024px) {
   .quote-review-image-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));

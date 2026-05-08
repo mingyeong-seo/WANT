@@ -33,21 +33,13 @@ export default function PublicHeader({
       <div className="landing-header__inner">
 
         {/* 로고 */}
-        {/* <button
-          type="button"
-          className="landing-brand"
-          onClick={() => moveToMain(controller)}
-          aria-label="메인으로 돌아가기"
-        >
-          <AppLogo subtitle="운송 운영 플랫폼" hideTitle />
-        </button> */}
         <button
           type="button"
           className="landing-brand"
           onClick={() => moveToMain(controller)}
           aria-label="메인으로 돌아가기"
         >
-          <AppLogo hideText />
+          <AppLogo subtitle="운송 운영 플랫폼" hideTitle />
         </button>
 
         {/* 메뉴 */}
