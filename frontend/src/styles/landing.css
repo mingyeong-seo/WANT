@@ -4,12 +4,16 @@
   padding: 0;
   gap: 0;
   background:
-    radial-gradient(circle at top left,
+    radial-gradient(
+      circle at top left,
       var(--hero-glow-a, rgba(94, 122, 212, 0.12)),
-      transparent 28%),
-    radial-gradient(circle at top right,
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
       var(--hero-glow-b, rgba(138, 110, 216, 0.1)),
-      transparent 26%),
+      transparent 26%
+    ),
     linear-gradient(180deg, #f7f9fc 0%, #edf2f8 40%, #f7f9fc 100%);
 }
 
@@ -240,9 +244,11 @@ body.theme-admin .app-logo__image {
   gap: 10px;
   text-align: center;
   border-radius: 28px;
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.88) 0%,
-      rgba(255, 255, 255, 0.82) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.82) 100%
+  );
   backdrop-filter: blur(16px);
   color: var(--text-strong);
 }
@@ -350,10 +356,12 @@ body.theme-admin .app-logo__image {
 }
 
 .landing-btn--primary {
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--primary) 88%, white 12%) 0%,
-      var(--primary) 58%,
-      color-mix(in srgb, var(--primary-dark) 68%, var(--primary) 32%) 100%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary) 88%, white 12%) 0%,
+    var(--primary) 58%,
+    color-mix(in srgb, var(--primary-dark) 68%, var(--primary) 32%) 100%
+  );
   color: #fff;
   box-shadow: 0 12px 22px rgba(var(--accent-rgb), 0.14);
 }
@@ -383,25 +391,38 @@ body.theme-admin .app-logo__image {
 
 .landing-hero__bg {
   background:
-    radial-gradient(circle at 76% 30%,
+    radial-gradient(
+      circle at 76% 30%,
       var(--hero-glow-a, rgba(94, 122, 212, 0.14)),
-      transparent 20%),
-    radial-gradient(circle at 68% 46%,
+      transparent 20%
+    ),
+    radial-gradient(
+      circle at 68% 46%,
       var(--hero-glow-b, rgba(138, 110, 216, 0.1)),
-      transparent 18%),
-    linear-gradient(90deg,
+      transparent 18%
+    ),
+    linear-gradient(
+      90deg,
       rgba(255, 255, 255, 0.9) 0%,
       rgba(255, 255, 255, 0.62) 34%,
       rgba(255, 255, 255, 0.28) 56%,
-      rgba(255, 255, 255, 0.34) 100%),
-    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.34) 100%
+    ),
+    linear-gradient(
+      90deg,
       var(--hero-grid, rgba(161, 174, 204, 0.28)) 0 1px,
-      transparent 1px 100%),
-    linear-gradient(0deg,
-      color-mix(in srgb,
-        var(--hero-grid, rgba(161, 174, 204, 0.28)) 78%,
-        transparent) 0 1px,
-      transparent 1px 100%),
+      transparent 1px 100%
+    ),
+    linear-gradient(
+      0deg,
+      color-mix(
+          in srgb,
+          var(--hero-grid, rgba(161, 174, 204, 0.28)) 78%,
+          transparent
+        )
+        0 1px,
+      transparent 1px 100%
+    ),
     linear-gradient(135deg, #f7fbff 0%, #eff4fa 46%, #e7edf5 100%);
   background-size:
     auto,
@@ -414,11 +435,13 @@ body.theme-admin .app-logo__image {
 }
 
 .landing-hero__overlay {
-  background: linear-gradient(90deg,
-      rgba(247, 249, 252, 0.98) 0%,
-      rgba(247, 249, 252, 0.88) 28%,
-      rgba(247, 249, 252, 0.34) 56%,
-      rgba(247, 249, 252, 0.18) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(247, 249, 252, 0.98) 0%,
+    rgba(247, 249, 252, 0.88) 28%,
+    rgba(247, 249, 252, 0.34) 56%,
+    rgba(247, 249, 252, 0.18) 100%
+  );
 }
 
 .landing-hero__inner {
@@ -432,12 +455,12 @@ body.theme-admin .app-logo__image {
   min-height: calc(60vh - 84px);
 }
 
-
 /* 추가 */
 .landing-hero__visual {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
-
 
 .landing-kicker,
 .landing-authCard__eyebrow,
@@ -538,10 +561,12 @@ body.theme-admin .app-logo__image {
   min-height: 560px;
   border-radius: 40px;
   overflow: hidden;
-  background: radial-gradient(circle at center,
-      rgba(255, 255, 255, 0.8),
-      rgba(241, 245, 249, 0.68) 56%,
-      rgba(226, 232, 240, 0.36) 100%);
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.8),
+    rgba(241, 245, 249, 0.68) 56%,
+    rgba(226, 232, 240, 0.36) 100%
+  );
 }
 
 .landing-visualCard__glow {
@@ -606,9 +631,11 @@ body.theme-admin .app-logo__image {
   width: 188px;
   height: 214px;
   clip-path: polygon(50% 0%, 88% 14%, 88% 58%, 50% 100%, 12% 58%, 12% 14%);
-  background: linear-gradient(180deg,
-      rgba(168, 85, 247, 0.24) 0%,
-      rgba(37, 99, 235, 0.38) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(168, 85, 247, 0.24) 0%,
+    rgba(37, 99, 235, 0.38) 100%
+  );
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.7),
     0 20px 40px rgba(37, 99, 235, 0.12);
@@ -622,9 +649,11 @@ body.theme-admin .app-logo__image {
   border-radius: 30px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.92),
-      rgba(235, 241, 255, 0.82));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.92),
+    rgba(235, 241, 255, 0.82)
+  );
   color: #2563eb;
   font-size: 34px;
   font-weight: 900;
@@ -706,9 +735,11 @@ body.theme-admin .app-logo__image {
 
 .landing-infoPanel--faq,
 .landing-infoPanel--form {
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.72),
-      rgba(240, 246, 255, 0.82));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(240, 246, 255, 0.82)
+  );
 }
 
 .landing-accessBand {
@@ -874,10 +905,10 @@ body.theme-admin .app-logo__image {
   padding-right: 0;
 }
 
-.landing-board__inner>.landing-sectionHead,
-.landing-board__inner>.landing-filterRow,
-.landing-info__inner>.landing-sectionHead,
-.landing-solution>.landing-sectionHead,
+.landing-board__inner > .landing-sectionHead,
+.landing-board__inner > .landing-filterRow,
+.landing-info__inner > .landing-sectionHead,
+.landing-solution > .landing-sectionHead,
 .landing-infoGrid,
 .landing-boardGrid,
 .landing-stats__inner,
@@ -907,9 +938,11 @@ body.theme-admin .app-logo__image {
 }
 
 .landing-filterChip.active {
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--primary-dark) 84%, white 16%) 0%,
-      var(--primary) 100%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-dark) 84%, white 16%) 0%,
+    var(--primary) 100%
+  );
   color: #fff;
   box-shadow: 0 10px 24px rgba(var(--accent-rgb), 0.18);
 }
@@ -1008,9 +1041,11 @@ body.theme-admin .app-logo__image {
 }
 
 .landing-infoPanel--form {
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.72),
-      rgba(240, 246, 255, 0.82));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(240, 246, 255, 0.82)
+  );
 }
 
 .landing-infoPanel__top strong {
@@ -1104,7 +1139,6 @@ body.theme-admin .app-logo__image {
 }
 
 @media (max-width: 1200px) {
-
   .landing-hero__inner,
   .landing-accessBand__inner,
   .landing-boardGrid,
@@ -1170,9 +1204,8 @@ body.theme-admin .app-logo__image {
     width: 100%;
     overflow-x: auto;
     padding-bottom: 2px;
-  } */
-
-  .landing-nav {
+  }
+  */ .landing-nav {
     flex: 1;
     min-width: 0;
     justify-content: center;
@@ -1320,9 +1353,11 @@ body.theme-admin .app-logo__image {
   position: relative;
   border-radius: 28px;
   padding: 20px 20px 18px;
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.86) 0%,
-      rgba(248, 251, 255, 0.92) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.86) 0%,
+    rgba(248, 251, 255, 0.92) 100%
+  );
   border: 1px solid rgba(186, 201, 224, 0.42);
   box-shadow:
     0 16px 34px rgba(15, 23, 42, 0.06),
@@ -1339,12 +1374,16 @@ body.theme-admin .app-logo__image {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at top left,
+    radial-gradient(
+      circle at top left,
       rgba(96, 165, 250, 0.1),
-      transparent 32%),
-    radial-gradient(circle at top right,
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at top right,
       rgba(168, 85, 247, 0.07),
-      transparent 28%);
+      transparent 28%
+    );
   pointer-events: none;
 }
 
@@ -1355,7 +1394,7 @@ body.theme-admin .app-logo__image {
     inset 0 1px 0 rgba(255, 255, 255, 0.76);
 }
 
-.public-directory-card>* {
+.public-directory-card > * {
   position: relative;
   z-index: 1;
 }
@@ -1384,7 +1423,9 @@ body.theme-admin .app-logo__image {
   outline: none;
 }
 
-.public-directory-card__profileTrigger:hover .public-directory-card__profileText h3 {
+.public-directory-card__profileTrigger:hover
+  .public-directory-card__profileText
+  h3 {
   color: var(--primary);
 }
 
@@ -1455,9 +1496,11 @@ body.theme-admin .app-logo__image {
 .public-directory-card__favoriteBtn.is-active {
   color: var(--primary);
   border-color: rgba(59, 130, 246, 0.34);
-  background: linear-gradient(180deg,
-      rgba(239, 246, 255, 0.98),
-      rgba(219, 234, 254, 0.9));
+  background: linear-gradient(
+    180deg,
+    rgba(239, 246, 255, 0.98),
+    rgba(219, 234, 254, 0.9)
+  );
   box-shadow: 0 10px 22px rgba(37, 99, 235, 0.1);
 }
 
@@ -1480,18 +1523,20 @@ body.theme-admin .app-logo__image {
   border-radius: 18px;
   overflow: hidden;
   border: 1px solid rgba(186, 201, 224, 0.38);
-  background: linear-gradient(180deg,
-      rgba(255, 255, 255, 0.8) 0%,
-      rgba(245, 248, 252, 0.9) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(245, 248, 252, 0.9) 100%
+  );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68);
 }
 
-.public-directory-card__summaryStats>div {
+.public-directory-card__summaryStats > div {
   padding: 14px 10px 13px;
   text-align: center;
 }
 
-.public-directory-card__summaryStats>div+div {
+.public-directory-card__summaryStats > div + div {
   border-left: 1px solid rgba(186, 201, 224, 0.32);
 }
 
@@ -1551,7 +1596,7 @@ body.theme-admin .app-logo__image {
     font-size: 12px;
   }
 
-  .public-directory-card__summaryStats>div {
+  .public-directory-card__summaryStats > div {
     padding: 12px 8px;
   }
 
@@ -1650,7 +1695,6 @@ body.theme-admin .app-logo__image {
 }
 
 @media (max-width: 820px) {
-
   .public-directory-search__controls,
   .public-directory-grid,
   .public-directory-card__stats {
@@ -1661,7 +1705,7 @@ body.theme-admin .app-logo__image {
     grid-template-columns: 1fr;
   }
 
-  .public-directory-card__summaryStats>div+div {
+  .public-directory-card__summaryStats > div + div {
     border-left: 0;
     border-top: 1px solid rgba(226, 232, 240, 0.9);
   }
@@ -1728,7 +1772,11 @@ body.theme-admin .app-logo__image {
   color: var(--text-sub);
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
 }
 
 .landing-pageButton {
@@ -1753,9 +1801,11 @@ body.theme-admin .app-logo__image {
 
 .landing-pageNumber.active {
   border-color: transparent;
-  background: linear-gradient(135deg,
-      color-mix(in srgb, var(--primary-dark) 84%, white 16%) 0%,
-      var(--primary) 100%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-dark) 84%, white 16%) 0%,
+    var(--primary) 100%
+  );
   color: #fff;
   box-shadow: 0 10px 24px rgba(var(--accent-rgb), 0.18);
 }
