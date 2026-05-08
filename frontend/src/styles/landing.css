@@ -452,6 +452,13 @@ body.theme-admin .app-logo__image {
   min-height: calc(60vh - 84px);
 }
 
+
+/* 추가 */
+.landing-hero__visual {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
 .landing-kicker,
 .landing-authCard__eyebrow,
 .landing-sectionHead span,
@@ -1154,6 +1161,45 @@ body.theme-admin .app-logo__image {
   .landing-visualCard {
     min-height: 460px;
   }
+
+  /* 추가 */
+  .landing-hero__visual {
+    opacity: 0;
+    transform: translateX(120px) scale(0.98);
+    max-width: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .landing-hero__inner {
+    grid-template-columns: 1fr;
+    transition: all 0.5s ease;
+  }
+
+  .landing-hero__visual {
+    display: none;
+  }
+
+  .landing-hero__copy {
+    order: 1;
+  }
+
+  .landing-stats {
+    order: 2;
+    margin-top: -200px;
+  }
+
+  .landing-hero__inner {
+    min-height: 50vh;
+  }
+}
+
+@media (max-width: 1280px) {
+  .landing-hero__visual {
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+  }
 }
 
 @media (max-width: 920px) {
@@ -1173,6 +1219,7 @@ body.theme-admin .app-logo__image {
     overflow-x: auto;
     padding-bottom: 2px;
   } */
+
   .landing-nav {
     flex: 1;
     min-width: 0;
@@ -1182,9 +1229,16 @@ body.theme-admin .app-logo__image {
     width: auto;
   }
 
-  .landing-hero {
+  /* .landing-hero {
     min-height: auto;
     padding-top: 28px;
+  } */
+
+  /* 추가 */
+  .landing-hero {
+    padding-top: 28px;
+    padding-bottom: 80px;
+    min-height: 100px;
   }
 
   .landing-hero__copy h1 {
