@@ -96,7 +96,6 @@ export default function RoundsLiteArena({ controller }) {
   const [tick, setTick] = useState(Date.now())
   const [copied, setCopied] = useState(false)
   const [arenaScale, setArenaScale] = useState(1)
-  const [submittedCardPickKey, setSubmittedCardPickKey] = useState('')
 
   const inputRef = useRef({ left: false, right: false, jump: false, drop: false, shoot: false, aimX: ARENA_WIDTH / 2, aimY: ARENA_HEIGHT / 2 })
   const arenaViewportRef = useRef(null)
@@ -128,15 +127,8 @@ export default function RoundsLiteArena({ controller }) {
     [room]
   )
   const pendingPickerSeats = useMemo(() => parsePickerSeats(room?.pickerSeat), [room?.pickerSeat])
-  const cardPickKey = room?.roomCode && room?.roundNo && room?.mySeat
-    ? `${room.roomCode}:${room.roundNo}:${room.mySeat}`
-    : ''
-  const hasSubmittedCardPick = room?.phase === 'CARD_PICK' && !!cardPickKey && submittedCardPickKey === cardPickKey
-  const isPicker = Boolean(
-    !hasSubmittedCardPick &&
-    (room?.myCardPickPending || me?.cardPickPending || (!!room?.mySeat && pendingPickerSeats.includes(room.mySeat)))
-  )
-  const waitingForCardPick = room?.phase === 'CARD_PICK' && (hasSubmittedCardPick || !isPicker)
+  const isPicker = Boolean(room?.myCardPickPending || me?.cardPickPending || (!!room?.mySeat && pendingPickerSeats.includes(room.mySeat)))
+  const waitingForCardPick = room?.phase === 'CARD_PICK' && !isPicker
 
   useEffect(() => {
     const viewport = arenaViewportRef.current
@@ -194,12 +186,6 @@ export default function RoundsLiteArena({ controller }) {
     startLoops(room.roomCode)
     return () => stopLoops()
   }, [room?.roomCode])
-
-  useEffect(() => {
-    if (room?.phase !== 'CARD_PICK') {
-      setSubmittedCardPickKey('')
-    }
-  }, [room?.phase, room?.roundNo, room?.roomCode])
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -419,19 +405,11 @@ export default function RoundsLiteArena({ controller }) {
 
     const currentMe = current.players?.find((player) => player.seat === current.mySeat)
     const pendingSeats = parsePickerSeats(current.pickerSeat)
-    const currentPickKey = current.roomCode && current.roundNo && current.mySeat
-      ? `${current.roomCode}:${current.roundNo}:${current.mySeat}`
-      : ''
-    const alreadySubmitted = currentPickKey && submittedCardPickKey === currentPickKey
-    const canPickCard = Boolean(
-      !alreadySubmitted &&
-      (current.myCardPickPending || currentMe?.cardPickPending || pendingSeats.includes(current.mySeat))
-    )
+    const canPickCard = Boolean(current.myCardPickPending || currentMe?.cardPickPending || pendingSeats.includes(current.mySeat))
     if (!canPickCard || cardSelectLockRef.current) return
 
     cardSelectLockRef.current = true
     actionInFlightRef.current = true
-    setSubmittedCardPickKey(currentPickKey)
     setLoading(true)
     setError('')
 
@@ -439,7 +417,6 @@ export default function RoundsLiteArena({ controller }) {
       const response = await selectRoundsLiteCard(current.roomCode, cardKey)
       setRoom(response)
     } catch (cardError) {
-      setSubmittedCardPickKey('')
       setError(getErrorMessage(cardError, '카드 선택에 실패했습니다.'))
     } finally {
       cardSelectLockRef.current = false
