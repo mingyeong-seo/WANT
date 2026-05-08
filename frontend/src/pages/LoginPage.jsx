@@ -6,12 +6,16 @@ const LoginPage = ({ controller }) => {
 
     const [kakaoAccessToken, setKakaoAccessToken] = useState("");
     const [showRoleModal, setShowRoleModal] = useState(false);
+    const [loginErrorOpen, setLoginErrorOpen] = useState(false);
 
     const handleClickLogin = async () => {
         const success = await controller.handleLogin();
         if (success) {
             controller.setRoutePage("main");
+            return;
         }
+
+        setLoginErrorOpen(true);
     };
 
     const handleKakaoLogin = () => {
@@ -83,9 +87,10 @@ const LoginPage = ({ controller }) => {
                     placeholder="이메일을 입력하세요"
                     className="login-input"
                     value={loginForm.email}
-                    onChange={(e) =>
-                        setLoginForm({ ...loginForm, email: e.target.value })
-                    }
+                    onChange={(e) => {
+                        setLoginErrorOpen(false);
+                        setLoginForm({ ...loginForm, email: e.target.value });
+                    }}
                 />
 
                 <label className="login-label">비밀번호</label>
@@ -94,9 +99,10 @@ const LoginPage = ({ controller }) => {
                     placeholder="비밀번호를 입력하세요"
                     className="login-input"
                     value={loginForm.password}
-                    onChange={(e) =>
-                        setLoginForm({ ...loginForm, password: e.target.value })
-                    }
+                    onChange={(e) => {
+                        setLoginErrorOpen(false);
+                        setLoginForm({ ...loginForm, password: e.target.value });
+                    }}
                 />
 
                 <div className="login-options">
@@ -141,6 +147,31 @@ const LoginPage = ({ controller }) => {
                     메인으로 돌아가기
                 </div>
             </div>
+
+            {loginErrorOpen && (
+                <div className="login-error-modal-backdrop" onClick={() => setLoginErrorOpen(false)}>
+                    <div className="login-error-modal" onClick={(e) => e.stopPropagation()}>
+                        <button
+                            type="button"
+                            className="login-error-close"
+                            onClick={() => setLoginErrorOpen(false)}
+                            aria-label="닫기"
+                        >
+                            ×
+                        </button>
+                        <div className="login-error-icon">!</div>
+                        <h3>로그인 실패</h3>
+                        <p>잘못된 아이디 / 비밀번호 입니다</p>
+                        <button
+                            type="button"
+                            className="login-error-confirm"
+                            onClick={() => setLoginErrorOpen(false)}
+                        >
+                            확인
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {showRoleModal && (
                 <div className="kakao-role-modal-backdrop">

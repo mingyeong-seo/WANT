@@ -55,15 +55,29 @@ export default function UserBoardTab({ controller }) {
   // 추가
   const [statusFilter, setStatusFilter] = useState("ALL");
 
+  const currentUserId = Number(
+    auth?.id || controller.profile?.id || localStorage.getItem("userId") || 0,
+  );
+
+  const isSelectedShipperOwner =
+    !!selected &&
+    auth.role === "SHIPPER" &&
+    !!currentUserId &&
+    Number(selected.shipperId) === currentUserId;
+
+  const isSelectedAssignedDriver =
+    !!selected &&
+    auth.role === "DRIVER" &&
+    (selected.assignedToMe === true ||
+      (!!currentUserId && Number(selected.assignedDriverId) === currentUserId) ||
+      (!!auth?.email && selected.assignedDriverEmail === auth.email));
+
   const showCancelButton =
-    selected &&
+    !!selected &&
     (selected.status === "BIDDING" ||
       selected.status === "CONFIRMED" ||
       selected.status === "IN_TRANSIT") &&
-    ((auth.role === "SHIPPER" &&
-      selected.shipperId ===
-        Number(localStorage.getItem("userId") || selected.shipperId)) ||
-      (auth.role === "DRIVER" && selected.assignedToMe));
+    (isSelectedShipperOwner || isSelectedAssignedDriver);
 
   // 추가
   const sortedShipments = useMemo(() => {
@@ -521,7 +535,7 @@ export default function UserBoardTab({ controller }) {
                   </div>
                 )}
 
-              {auth.role === "SHIPPER" && selected.status === "CONFIRMED" && (
+              {isSelectedShipperOwner && selected.status === "CONFIRMED" && (
                 <div className="surface-sub">
                   <strong>{selected.paid ? "결제 완료" : "결제 필요"}</strong>
                   <p className="section-desc">
@@ -577,7 +591,8 @@ export default function UserBoardTab({ controller }) {
                         <p>{formatCurrency(offer.price)}</p>
                         <small>{offer.message || "메시지 없음"}</small>
 
-                        {selected.status === "BIDDING" &&
+                        {isSelectedShipperOwner &&
+                          selected.status === "BIDDING" &&
                           offer.status === "PENDING" && (
                             <button
                               className="btn btn-primary small"
