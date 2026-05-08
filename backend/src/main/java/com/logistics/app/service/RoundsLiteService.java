@@ -8,7 +8,7 @@ import com.logistics.app.entity.RoundsLiteRoom;
 import com.logistics.app.entity.User;
 import com.logistics.app.repository.RoundsLitePlayerRepository;
 import com.logistics.app.repository.RoundsLiteRoomRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -227,11 +227,16 @@ public class RoundsLiteService {
         return toResponse(room, user.getId());
     }
 
+    @Transactional(readOnly = true)
     public GameDtos.RoundsLiteRoomResponse getState(String roomCode, User user) {
-        RoundsLiteRoom room = getRoomForUpdate(roomCode);
+        RoundsLiteRoom room = getRoom(roomCode);
         requireMember(room, user.getId());
+
+        // 상태 조회 API는 두 클라이언트가 짧은 간격으로 계속 호출한다.
+        // 여기서 비관적 쓰기 락과 saveAndFlush까지 수행하면 input/select-card 요청과
+        // 서로 방 row, player row 락 순서가 꼬이면서 PostgreSQL deadlock이 발생할 수 있다.
+        // 조회 응답에 필요한 시뮬레이션은 메모리 상에서만 반영하고 DB에는 저장하지 않는다.
         simulateRoom(room);
-        roomRepository.saveAndFlush(room);
         return toResponse(room, user.getId());
     }
 
