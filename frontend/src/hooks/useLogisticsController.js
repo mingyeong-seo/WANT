@@ -1755,7 +1755,13 @@ export function useLogisticsController() {
       );
       return true; // 로그인 성공 시 true 반환
     } catch (err) {
-      setMessage(err.response?.data?.message || "로그인 실패");
+      const status = err.response?.status;
+      const errorMessage =
+        status === 401 || status === 403
+          ? "잘못된 아이디 / 비밀번호 입니다"
+          : err.response?.data?.message || "로그인 중 오류가 발생했습니다.";
+
+      setMessage(errorMessage);
       return false; // 로그인 실패 시 false 반환
     }
   };
