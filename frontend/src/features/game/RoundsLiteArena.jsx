@@ -297,7 +297,7 @@ export default function RoundsLiteArena({ controller }) {
       if (!silent) {
         setError(getErrorMessage(fetchError, '게임 상태를 불러오지 못했습니다.'))
       }
-      throw fetchError
+      return null
     }
   }
 
