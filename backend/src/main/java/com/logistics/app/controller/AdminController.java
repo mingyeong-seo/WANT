@@ -43,6 +43,16 @@ public class AdminController {
         return adminService.updateMemberStatus(memberId, request, currentUser(authentication));
     }
 
+    @PatchMapping("/members/{memberId}/penalty")
+    public AdminDtos.MemberRow updatePenalty(@PathVariable Long memberId, @RequestBody AdminDtos.UpdateMemberPenaltyRequest request, Authentication authentication) {
+        return adminService.updateMemberPenalty(memberId, request, currentUser(authentication));
+    }
+
+    @PostMapping("/members/{memberId}/penalty")
+    public AdminDtos.MemberRow updatePenaltyByPost(@PathVariable Long memberId, @RequestBody AdminDtos.UpdateMemberPenaltyRequest request, Authentication authentication) {
+        return adminService.updateMemberPenalty(memberId, request, currentUser(authentication));
+    }
+
     @GetMapping("/shipments")
     public List<AdminDtos.ShipmentAdminRow> shipments() { return adminService.getShipments(); }
 

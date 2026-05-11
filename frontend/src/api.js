@@ -178,6 +178,9 @@ export const updateMemberRole = async (memberId, role) =>
 export const updateMemberStatus = async (memberId, status) =>
   (await api.patch(`/api/admin/members/${memberId}/status`, { status })).data;
 
+export const updateMemberPenalty = async (memberId, payload) =>
+  (await api.patch(`/api/admin/members/${memberId}/status`, payload)).data;
+
 export const fetchAdminShipments = async () =>
   (await api.get('/api/admin/shipments')).data;
 

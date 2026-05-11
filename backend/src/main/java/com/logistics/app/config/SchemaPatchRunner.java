@@ -18,9 +18,38 @@ public class SchemaPatchRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        patchUserTable();
         patchShipmentTable();
         createPasswordResetTokenTable();
         createAssistantTables();
+    }
+    private void patchUserTable() {
+        if (!tableExists("users")) {
+            return;
+        }
+
+        addColumnIfMissing("users", "status", "varchar(255)");
+        addColumnIfMissing("users", "penalty_score30d", "integer");
+        addColumnIfMissing("users", "matching_blocked_until", "timestamp");
+        addColumnIfMissing("users", "trading_blocked_until", "timestamp");
+        addColumnIfMissing("users", "cancel_count", "integer");
+        addColumnIfMissing("users", "completed_transaction_count", "integer");
+        addColumnIfMissing("users", "cancel_rate", "double precision");
+        addColumnIfMissing("users", "high_cancel_badge", "boolean");
+        addColumnIfMissing("users", "penalty_rating_delta", "double precision");
+        addColumnIfMissing("users", "profile_completed", "boolean");
+
+        jdbcTemplate.execute("UPDATE users SET status = 'ACTIVE' WHERE status IS NULL OR status = ''");
+        jdbcTemplate.execute("UPDATE users SET penalty_score30d = 0 WHERE penalty_score30d IS NULL");
+        jdbcTemplate.execute("UPDATE users SET cancel_count = 0 WHERE cancel_count IS NULL");
+        jdbcTemplate.execute("UPDATE users SET completed_transaction_count = 0 WHERE completed_transaction_count IS NULL");
+        jdbcTemplate.execute("UPDATE users SET cancel_rate = 0 WHERE cancel_rate IS NULL");
+        jdbcTemplate.execute("UPDATE users SET high_cancel_badge = FALSE WHERE high_cancel_badge IS NULL");
+        jdbcTemplate.execute("UPDATE users SET penalty_rating_delta = 0 WHERE penalty_rating_delta IS NULL");
+        jdbcTemplate.execute("UPDATE users SET profile_completed = FALSE WHERE profile_completed IS NULL");
+
+        jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN status SET DEFAULT 'ACTIVE'");
+        jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN status SET NOT NULL");
     }
 
     private void patchShipmentTable() {

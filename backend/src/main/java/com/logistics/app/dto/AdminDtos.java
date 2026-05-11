@@ -36,6 +36,9 @@ public class AdminDtos {
         private String phone;
         private Double averageRating;
         private long ratingCount;
+        private Integer penaltyScore30d;
+        private LocalDateTime matchingBlockedUntil;
+        private LocalDateTime tradingBlockedUntil;
         private LocalDateTime createdAt;
     }
 
@@ -47,6 +50,18 @@ public class AdminDtos {
     @Data
     public static class UpdateMemberStatusRequest {
         private UserStatus status;
+        private Integer penaltyScore30d;
+        private LocalDateTime matchingBlockedUntil;
+        private LocalDateTime tradingBlockedUntil;
+        private String note;
+    }
+
+    @Data
+    public static class UpdateMemberPenaltyRequest {
+        private Integer penaltyScore30d;
+        private LocalDateTime matchingBlockedUntil;
+        private LocalDateTime tradingBlockedUntil;
+        private String note;
     }
 
     @Data @Builder

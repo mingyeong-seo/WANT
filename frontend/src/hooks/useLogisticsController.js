@@ -55,6 +55,7 @@ import {
   updateAdminNotice,
   updateMemberRole,
   updateMemberStatus,
+  updateMemberPenalty,
   updateMyProfile,
   uploadMyProfileImage,
   createRating,
@@ -336,14 +337,32 @@ export function useLogisticsController() {
     });
   };
 
+  const isFutureDateTime = (value) => {
+    if (!value) return false;
+
+    const targetTime = new Date(value).getTime();
+    if (Number.isNaN(targetTime)) return false;
+
+    return targetTime > Date.now();
+  };
+
+  const isPenaltyBlocked = (shipment = selected) => {
+    if (!shipment) return false;
+
+    return (
+      isFutureDateTime(shipment.viewerTradingBlockedUntil) ||
+      isFutureDateTime(shipment.viewerMatchingBlockedUntil)
+    );
+  };
+
   const getPenaltyBlockedMessage = (shipment = selected) => {
     if (!shipment) return "패널티 상태입니다.";
 
-    if (shipment.viewerTradingBlockedUntil) {
+    if (isFutureDateTime(shipment.viewerTradingBlockedUntil)) {
       return `패널티 상태입니다.\n현재 거래가 불가능합니다.\n거래 금지 해제 시각: ${shipment.viewerTradingBlockedUntil}`;
     }
 
-    if (shipment.viewerMatchingBlockedUntil) {
+    if (isFutureDateTime(shipment.viewerMatchingBlockedUntil)) {
       return `패널티 상태입니다.\n현재 거래가 불가능합니다.\n매칭 제한 해제 시각: ${shipment.viewerMatchingBlockedUntil}`;
     }
 
@@ -1444,10 +1463,10 @@ export function useLogisticsController() {
   const loadFinance = async () => {
     if (!isLoggedIn) return;
 
-    const [summaryData, transactionsData] = await Promise.all([
-      fetchFinanceSummary(),
-      fetchFinanceTransactions(),
-    ]);
+    // summary와 transactions를 동시에 호출하면 백엔드 정산 보정 로직이 동시에 실행되어
+    // 같은 화물의 수익/수수료가 중복 생성될 수 있으므로 순차 호출한다.
+    const transactionsData = await fetchFinanceTransactions();
+    const summaryData = await fetchFinanceSummary();
 
     setFinanceSummary(summaryData);
     setFinanceTransactions(transactionsData);
@@ -1819,10 +1838,7 @@ export function useLogisticsController() {
   const handleCreateOffer = async () => {
     const blockedMessage = getPenaltyBlockedMessage();
 
-    if (
-      selected?.viewerTradingBlockedUntil ||
-      selected?.viewerMatchingBlockedUntil
-    ) {
+    if (isPenaltyBlocked()) {
       openPenaltyBlockedModal(blockedMessage);
       return;
     }
@@ -1912,10 +1928,7 @@ export function useLogisticsController() {
   const handleAcceptOffer = async (offerId) => {
     const blockedMessage = getPenaltyBlockedMessage();
 
-    if (
-      selected?.viewerTradingBlockedUntil ||
-      selected?.viewerMatchingBlockedUntil
-    ) {
+    if (isPenaltyBlocked()) {
       openPenaltyBlockedModal(blockedMessage);
       return;
     }
@@ -2075,6 +2088,16 @@ export function useLogisticsController() {
       await loadAdmin();
     } catch (err) {
       setMessage(err.response?.data?.message || "회원 변경 실패");
+    }
+  };
+
+  const handleUpdateMemberPenalty = async (memberId, payload) => {
+    try {
+      await updateMemberPenalty(memberId, payload);
+      setMessage("패널티 정보가 변경되었습니다.");
+      await loadAdmin();
+    } catch (err) {
+      setMessage(err.response?.data?.message || "패널티 변경 실패");
     }
   };
 
@@ -2489,6 +2512,7 @@ export function useLogisticsController() {
     reloadChatRoom,
     handleCreateRating,
     handleUpdateMember,
+    handleUpdateMemberPenalty,
     handleForceShipmentStatus,
     submitNotice,
     submitFaq,

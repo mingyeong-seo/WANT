@@ -3,9 +3,20 @@ import SectionTitle from '../../../components/common/SectionTitle'
 import useClientPagination from '../../../hooks/useClientPagination'
 import { formatCurrency, formatDate, transactionTypeText } from '../../../utils/formatters'
 
+const dedupeFinanceTransactions = (transactions = []) => {
+  const seen = new Set()
+  return transactions.filter((item) => {
+    const key = `${item.shipmentId || item.id}-${item.type || 'UNKNOWN'}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
 export default function AdminFinanceTab({ controller }) {
   const { financeSummary, financeTransactions } = controller
-  const { pagedItems, page, setPage, totalPages } = useClientPagination(financeTransactions, 10)
+  const normalizedFinanceTransactions = dedupeFinanceTransactions(financeTransactions)
+  const { pagedItems, page, setPage, totalPages } = useClientPagination(normalizedFinanceTransactions, 10)
 
   return (
     <div className="page-stack">
@@ -30,7 +41,7 @@ export default function AdminFinanceTab({ controller }) {
           <span>총 정산 원금</span>
           <strong>
             {formatCurrency(
-              financeTransactions
+              normalizedFinanceTransactions
                 .filter((item) => item.type === 'SPEND')
                 .reduce((sum, item) => sum + (item.grossAmount || 0), 0),
             )}
