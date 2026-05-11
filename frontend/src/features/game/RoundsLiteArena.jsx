@@ -45,6 +45,19 @@ function parsePickerSeats(value) {
     .filter(Boolean)
 }
 
+function createNeutralInput() {
+  return { left: false, right: false, jump: false, drop: false, shoot: false, aimX: ARENA_WIDTH / 2, aimY: ARENA_HEIGHT / 2 }
+}
+
+function shouldSnapVisualRoom(current, target) {
+  if (!current || !target) return true
+  return (
+    current.roomCode !== target.roomCode ||
+    current.mapKey !== target.mapKey ||
+    current.phase !== target.phase ||
+    current.roundNo !== target.roundNo
+  )
+}
 
 function blendVisualRoom(current, target) {
   if (!target) return null
@@ -98,7 +111,7 @@ export default function RoundsLiteArena({ controller }) {
   const [arenaScale, setArenaScale] = useState(1)
   const [submittedCardPickKey, setSubmittedCardPickKey] = useState('')
 
-  const inputRef = useRef({ left: false, right: false, jump: false, drop: false, shoot: false, aimX: ARENA_WIDTH / 2, aimY: ARENA_HEIGHT / 2 })
+  const inputRef = useRef(createNeutralInput())
   const arenaViewportRef = useRef(null)
   const arenaRef = useRef(null)
   const pollRef = useRef(null)
@@ -168,8 +181,14 @@ export default function RoundsLiteArena({ controller }) {
       return
     }
 
-    setDisplayRoom((previous) => blendVisualRoom(previous, room))
+    setDisplayRoom((previous) => (shouldSnapVisualRoom(previous, room) ? room : blendVisualRoom(previous, room)))
   }, [room])
+
+  useEffect(() => {
+    if (room?.phase !== 'ACTIVE') {
+      inputRef.current = createNeutralInput()
+    }
+  }, [room?.phase, room?.roomCode, room?.roundNo])
 
   useEffect(() => {
     if (room?.phase !== 'CARD_PICK') {
@@ -286,13 +305,21 @@ export default function RoundsLiteArena({ controller }) {
     animationRef.current = requestAnimationFrame(animate)
   }
 
+  function applyRoomResponse(response, snapVisual = true) {
+    setRoom(response)
+    visualTargetRef.current = response
+    if (snapVisual) {
+      setDisplayRoom(response)
+    }
+  }
+
   async function fetchState(roomCode, silent = false) {
     if (silent && (actionInFlightRef.current || cardSelectLockRef.current)) return null
 
     try {
       const response = await getRoundsLiteState(roomCode)
       if (silent && (actionInFlightRef.current || cardSelectLockRef.current)) return response
-      setRoom(response)
+      applyRoomResponse(response, false)
       setTick(Date.now())
       if (!silent) setError('')
       return response
@@ -311,7 +338,7 @@ export default function RoundsLiteArena({ controller }) {
     setError('')
     try {
       const response = await createRoundsLiteRoom()
-      setRoom(response)
+      applyRoomResponse(response)
       setRoomCodeInput(response.roomCode)
       localStorage.setItem(LAST_ROOM_KEY, response.roomCode)
     } catch (createError) {
@@ -337,7 +364,7 @@ export default function RoundsLiteArena({ controller }) {
 
     try {
       const response = await joinRoundsLiteRoom(trimmed)
-      setRoom(response)
+      applyRoomResponse(response)
       setRoomCodeInput(response.roomCode)
       localStorage.setItem(LAST_ROOM_KEY, response.roomCode)
     } catch (joinError) {
@@ -356,7 +383,7 @@ export default function RoundsLiteArena({ controller }) {
 
     try {
       const response = await joinRoundsLiteMatchmaking()
-      setRoom(response)
+      applyRoomResponse(response)
       setRoomCodeInput(response.roomCode)
       localStorage.setItem(LAST_ROOM_KEY, response.roomCode)
     } catch (matchError) {
@@ -400,7 +427,7 @@ export default function RoundsLiteArena({ controller }) {
 
     try {
       const response = await readyRoundsLiteRoom(room.roomCode)
-      setRoom(response)
+      applyRoomResponse(response)
     } catch (readyError) {
       setError(getErrorMessage(readyError, '준비 처리에 실패했습니다.'))
     } finally {
@@ -414,7 +441,7 @@ export default function RoundsLiteArena({ controller }) {
 
     try {
       const response = await sendRoundsLiteInput(roomCode, inputRef.current)
-      setRoom(response)
+      applyRoomResponse(response, false)
     } catch (inputError) {
       if (!silent) {
         setError(getErrorMessage(inputError, '입력 전송에 실패했습니다.'))
@@ -440,7 +467,7 @@ export default function RoundsLiteArena({ controller }) {
 
     try {
       const response = await selectRoundsLiteCard(current.roomCode, cardKey)
-      setRoom(response)
+      applyRoomResponse(response)
     } catch (cardError) {
       setSubmittedCardPickKey('')
       setError(getErrorMessage(cardError, '카드 선택에 실패했습니다.'))
@@ -461,7 +488,7 @@ export default function RoundsLiteArena({ controller }) {
 
     try {
       const response = await resetRoundsLiteRoom(room.roomCode)
-      setRoom(response)
+      applyRoomResponse(response)
     } catch (resetError) {
       setError(getErrorMessage(resetError, '매치 초기화에 실패했습니다.'))
     } finally {

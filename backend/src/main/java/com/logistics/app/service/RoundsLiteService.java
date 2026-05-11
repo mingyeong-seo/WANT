@@ -567,14 +567,15 @@ public class RoundsLiteService {
         player.setX(clamp(player.getX() + player.getVx() * dt, 0d, ARENA_WIDTH - PLAYER_WIDTH));
         player.setY(player.getY() + player.getVy() * dt);
 
-        resolveVerticalCollision(player);
+        resolveVerticalCollision(player, dt);
     }
 
-    private void resolveVerticalCollision(RoundsLitePlayer player) {
+    private void resolveVerticalCollision(RoundsLitePlayer player, double dt) {
         List<Platform> platforms = platforms(player.getRoom());
         boolean grounded = false;
         LocalDateTime now = LocalDateTime.now();
         boolean ignoreDropPlatforms = player.getDropThroughUntil() != null && now.isBefore(player.getDropThroughUntil());
+
         for (Platform platform : platforms) {
             if (platform.bulletOnly()) {
                 continue;
@@ -582,15 +583,23 @@ public class RoundsLiteService {
             if (platform.oneWay() && ignoreDropPlatforms) {
                 continue;
             }
+
             double playerBottom = player.getY() + PLAYER_HEIGHT;
-            double previousBottom = playerBottom - player.getVy() * TICK_SECONDS;
+            double previousBottom = playerBottom - player.getVy() * dt;
             boolean overlapsX = player.getX() + PLAYER_WIDTH > platform.x && player.getX() < platform.x + platform.w;
-            if (overlapsX && player.getVy() >= 0d && previousBottom <= platform.y && playerBottom >= platform.y) {
+            boolean fallingOntoPlatform = player.getVy() >= 0d && previousBottom <= platform.y && playerBottom >= platform.y;
+            boolean slightlyEmbeddedOnPlatform = player.getVy() >= 0d
+                    && player.getY() < platform.y
+                    && playerBottom >= platform.y
+                    && playerBottom <= platform.y + Math.max(PLAYER_HEIGHT, platform.h + 12d);
+
+            if (overlapsX && (fallingOntoPlatform || slightlyEmbeddedOnPlatform)) {
                 player.setY(platform.y - PLAYER_HEIGHT);
                 player.setVy(0d);
                 grounded = true;
             }
         }
+
         if (grounded) {
             player.setDropThroughUntil(null);
         }
