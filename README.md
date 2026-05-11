@@ -208,46 +208,6 @@ CREATE DATABASE logistics;
 
 기본 설정은 PostgreSQL을 기준으로 되어 있습니다. 실행 시 `JPA_DDL_AUTO=update`를 사용하면 JPA 엔티티 기준으로 테이블이 자동 생성/갱신됩니다.
 
-## Backend 실행 방법
-
-```bash
-cd backend
-./mvnw spring-boot:run
-```
-
-Windows PowerShell 또는 CMD에서는 다음 명령을 사용할 수 있습니다.
-
-```bash
-cd backend
-mvnw.cmd spring-boot:run
-```
-
-정상 실행 시 기본 주소는 다음과 같습니다.
-
-```text
-http://localhost:8080
-```
-
-백엔드 정상 동작 확인용 공개 API:
-
-```text
-GET http://localhost:8080/public/overview
-```
-
-## Frontend 실행 방법
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-정상 실행 시 기본 주소는 다음과 같습니다.
-
-```text
-http://localhost:5173
-```
-
 ## 빌드 방법
 
 ### Frontend 빌드
@@ -398,9 +358,9 @@ npm install react-kakao-maps-sdk react-daum-postcode html2canvas jspdf qrcode @s
 | 이름 | 담당 |
 |---|---|
 | 김대호 | 프론트엔드 수정, 영수증 제작 |
-| 김도형 | DB 구조/엔티티 제작, 백엔드 제작, 운송현황 |
+| 김도형 | DB 구조/엔티티 제작, 백/프론트엔드 제작, 운송현황 |
 | 김승민 | 실제 사이트 배포, 백엔드 제작 |
-| 김재민 | API 연동, 전체 오류 수정, 미니게임 개발 및 개선 |
+| 김재민 | API 연동, 전체 오류 수정, 백/프론트엔드 제작, 미니게임 개발 |
 | 서효정 | 로그인/회원가입, 메인/마이페이지 프론트 제작 |
 | 서민경 | 견적 목록, 견적 등록 프론트 제작 |
 
