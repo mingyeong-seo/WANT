@@ -588,12 +588,8 @@ public class RoundsLiteService {
             double previousBottom = playerBottom - player.getVy() * dt;
             boolean overlapsX = player.getX() + PLAYER_WIDTH > platform.x && player.getX() < platform.x + platform.w;
             boolean fallingOntoPlatform = player.getVy() >= 0d && previousBottom <= platform.y && playerBottom >= platform.y;
-            boolean slightlyEmbeddedOnPlatform = player.getVy() >= 0d
-                    && player.getY() < platform.y
-                    && playerBottom >= platform.y
-                    && playerBottom <= platform.y + Math.max(PLAYER_HEIGHT, platform.h + 12d);
 
-            if (overlapsX && (fallingOntoPlatform || slightlyEmbeddedOnPlatform)) {
+            if (overlapsX && fallingOntoPlatform) {
                 player.setY(platform.y - PLAYER_HEIGHT);
                 player.setVy(0d);
                 grounded = true;
