@@ -260,7 +260,6 @@ public class RoundsLiteService {
 
     public GameDtos.RoundsLiteRoomResponse applyInput(String roomCode, User user, GameDtos.RoundsLiteInputRequest request) {
         RoundsLiteRoom room = getRoomForUpdate(roomCode);
-        simulateRoom(room);
         RoundsLitePlayer me = requireMember(room, user.getId());
 
         me.setMoveLeft(request.isLeft());
@@ -586,10 +585,10 @@ public class RoundsLiteService {
 
             double playerBottom = player.getY() + PLAYER_HEIGHT;
             double previousBottom = playerBottom - player.getVy() * dt;
-            boolean overlapsX = player.getX() + PLAYER_WIDTH > platform.x && player.getX() < platform.x + platform.w;
+            boolean canLandHorizontally = canLandHorizontally(player, platform);
             boolean fallingOntoPlatform = canLandOnPlatform(platform, player.getVy(), previousBottom, playerBottom);
 
-            if (overlapsX && fallingOntoPlatform) {
+            if (canLandHorizontally && fallingOntoPlatform) {
                 player.setY(platform.y - PLAYER_HEIGHT);
                 player.setVy(0d);
                 grounded = true;
@@ -613,6 +612,18 @@ public class RoundsLiteService {
 
         double oneWayLandingTolerance = 4d;
         return previousBottom <= platform.y - oneWayLandingTolerance && playerBottom >= platform.y;
+    }
+
+    private boolean canLandHorizontally(RoundsLitePlayer player, Platform platform) {
+        double playerLeft = player.getX();
+        double playerRight = player.getX() + PLAYER_WIDTH;
+        double playerCenterX = player.getX() + PLAYER_WIDTH * 0.5d;
+        double overlapWidth = Math.min(playerRight, platform.x + platform.w) - Math.max(playerLeft, platform.x);
+
+        if (overlapWidth < PLAYER_WIDTH * 0.35d) {
+            return false;
+        }
+        return playerCenterX >= platform.x + 2d && playerCenterX <= platform.x + platform.w - 2d;
     }
 
     private boolean isStandingOnDropPlatform(RoundsLitePlayer player) {

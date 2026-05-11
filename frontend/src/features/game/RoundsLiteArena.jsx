@@ -15,8 +15,8 @@ import './roundsLite.css'
 import { getMapDecor } from './maps'
 
 const LAST_ROOM_KEY = 'roundsLite:lastRoomCode'
-const POLL_INTERVAL = 500
-const INPUT_INTERVAL = 75
+const POLL_INTERVAL = 750
+const INPUT_INTERVAL = 120
 const VISUAL_LERP = 0.28
 const ARENA_WIDTH = 900
 const ARENA_HEIGHT = 500
@@ -121,6 +121,7 @@ export default function RoundsLiteArena({ controller }) {
   const visualTargetRef = useRef(null)
   const cardSelectLockRef = useRef(false)
   const actionInFlightRef = useRef(false)
+  const inputInFlightRef = useRef(false)
 
   const currentRoom = displayRoom || room
   const serverArenaWidth = currentRoom?.arenaWidth || ARENA_WIDTH
@@ -421,7 +422,9 @@ export default function RoundsLiteArena({ controller }) {
   }
 
   async function sendInput(roomCode, silent = false) {
-    if (actionInFlightRef.current || cardSelectLockRef.current) return
+    if (actionInFlightRef.current || cardSelectLockRef.current || inputInFlightRef.current) return
+
+    inputInFlightRef.current = true
 
     try {
       const response = await sendRoundsLiteInput(roomCode, inputRef.current)
@@ -430,6 +433,8 @@ export default function RoundsLiteArena({ controller }) {
       if (!silent) {
         setError(getErrorMessage(inputError, '입력 전송에 실패했습니다.'))
       }
+    } finally {
+      inputInFlightRef.current = false
     }
   }
 
