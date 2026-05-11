@@ -6,14 +6,19 @@ import { useRef, useState } from 'react'
 import { parseVehicleTypeString, stringifyVehicleTypes } from '../../../constants/vehicleCatalog'
 import { formatCurrency, resolveMediaUrl, statusText, formatRatingSummary, roleText } from '../../../utils/formatters'
 
+function isFutureDateTime(value) {
+  if (!value) return false
+  const time = new Date(value).getTime()
+  return !Number.isNaN(time) && time > Date.now()
+}
+
 function renderPenaltyStatus(profile) {
   if (!profile) return '정보 불러오는 중'
-  if (profile.tradingBlockedUntil) return '거래 금지 적용 중'
-  if (profile.matchingBlockedUntil) return '매칭 제한 적용 중'
+  if (isFutureDateTime(profile.tradingBlockedUntil)) return '거래 금지 적용 중'
+  if (isFutureDateTime(profile.matchingBlockedUntil)) return '매칭 제한 적용 중'
   if (profile.highCancelBadge) return '취소율 높음 주의 상태'
   return '정상'
 }
-
 export default function UserOverviewTab({ controller }) {
   const {
     auth,

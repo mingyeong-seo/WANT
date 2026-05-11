@@ -86,9 +86,83 @@ public class AdminService {
 
     public AdminDtos.MemberRow updateMemberStatus(Long memberId, AdminDtos.UpdateMemberStatusRequest request, User admin) {
         User member = getUser(memberId);
-        member.setStatus(request.getStatus());
-        log(admin, "MEMBER", member.getId(), "UPDATE_STATUS", member.getEmail() + " -> " + request.getStatus());
+        repairMemberDefaults(member);
+
+        if (request.getStatus() != null) {
+            member.setStatus(request.getStatus());
+            log(admin, "MEMBER", member.getId(), "UPDATE_STATUS", member.getEmail() + " -> " + request.getStatus());
+        }
+
+        if (request.getPenaltyScore30d() != null
+                || request.getMatchingBlockedUntil() != null
+                || request.getTradingBlockedUntil() != null
+                || request.getNote() != null) {
+            int nextScore = request.getPenaltyScore30d() == null
+                    ? (member.getPenaltyScore30d() == null ? 0 : member.getPenaltyScore30d())
+                    : Math.max(0, request.getPenaltyScore30d());
+
+            member.setPenaltyScore30d(nextScore);
+            member.setMatchingBlockedUntil(request.getMatchingBlockedUntil());
+            member.setTradingBlockedUntil(request.getTradingBlockedUntil());
+
+            String note = request.getNote() == null || request.getNote().isBlank() ? "관리자 패널티 조정" : request.getNote();
+            log(
+                    admin,
+                    "MEMBER",
+                    member.getId(),
+                    "UPDATE_PENALTY",
+                    member.getEmail() + " / 점수 " + nextScore + " / 매칭제한 " + request.getMatchingBlockedUntil() + " / 거래금지 " + request.getTradingBlockedUntil() + " / " + note
+            );
+        }
+
         return toMemberRow(member);
+    }
+
+    public AdminDtos.MemberRow updateMemberPenalty(Long memberId, AdminDtos.UpdateMemberPenaltyRequest request, User admin) {
+        User member = getUser(memberId);
+        repairMemberDefaults(member);
+        int nextScore = request.getPenaltyScore30d() == null ? 0 : Math.max(0, request.getPenaltyScore30d());
+
+        member.setPenaltyScore30d(nextScore);
+        member.setMatchingBlockedUntil(request.getMatchingBlockedUntil());
+        member.setTradingBlockedUntil(request.getTradingBlockedUntil());
+
+        String note = request.getNote() == null || request.getNote().isBlank() ? "관리자 패널티 조정" : request.getNote();
+        log(
+                admin,
+                "MEMBER",
+                member.getId(),
+                "UPDATE_PENALTY",
+                member.getEmail() + " / 점수 " + nextScore + " / 매칭제한 " + request.getMatchingBlockedUntil() + " / 거래금지 " + request.getTradingBlockedUntil() + " / " + note
+        );
+        return toMemberRow(member);
+    }
+
+    private void repairMemberDefaults(User member) {
+        if (member.getStatus() == null) {
+            member.setStatus(UserStatus.ACTIVE);
+        }
+        if (member.getPenaltyScore30d() == null) {
+            member.setPenaltyScore30d(0);
+        }
+        if (member.getCancelCount() == null) {
+            member.setCancelCount(0);
+        }
+        if (member.getCompletedTransactionCount() == null) {
+            member.setCompletedTransactionCount(0);
+        }
+        if (member.getCancelRate() == null) {
+            member.setCancelRate(0d);
+        }
+        if (member.getHighCancelBadge() == null) {
+            member.setHighCancelBadge(false);
+        }
+        if (member.getPenaltyRatingDelta() == null) {
+            member.setPenaltyRatingDelta(0d);
+        }
+        if (member.getProfileCompleted() == null) {
+            member.setProfileCompleted(false);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -323,6 +397,9 @@ public class AdminService {
                 .phone(user.getPhone())
                 .averageRating(average)
                 .ratingCount(ratings.size())
+                .penaltyScore30d(user.getPenaltyScore30d())
+                .matchingBlockedUntil(user.getMatchingBlockedUntil())
+                .tradingBlockedUntil(user.getTradingBlockedUntil())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

@@ -96,5 +96,29 @@ public class User {
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+        if (status == null) {
+            status = UserStatus.ACTIVE;
+        }
+        if (profileCompleted == null) {
+            profileCompleted = false;
+        }
+        if (penaltyScore30d == null) {
+            penaltyScore30d = 0;
+        }
+        if (cancelCount == null) {
+            cancelCount = 0;
+        }
+        if (completedTransactionCount == null) {
+            completedTransactionCount = 0;
+        }
+        if (cancelRate == null) {
+            cancelRate = 0d;
+        }
+        if (highCancelBadge == null) {
+            highCancelBadge = false;
+        }
+        if (penaltyRatingDelta == null) {
+            penaltyRatingDelta = 0d;
+        }
     }
 }

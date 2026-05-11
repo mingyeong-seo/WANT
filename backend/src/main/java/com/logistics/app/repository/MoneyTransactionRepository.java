@@ -18,5 +18,7 @@ public interface MoneyTransactionRepository extends JpaRepository<MoneyTransacti
 
     Optional<MoneyTransaction> findFirstByShipmentIdOrderByCreatedAtDesc(Long shipmentId);
     boolean existsByShipmentAndType(Shipment shipment, TransactionType type);
+    List<MoneyTransaction> findByShipmentAndTypeOrderByCreatedAtAsc(Shipment shipment, TransactionType type);
 }
+
 

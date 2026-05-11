@@ -10,7 +10,12 @@ import com.logistics.app.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -18,6 +23,7 @@ import java.util.UUID;
 public class FinanceService {
 
     public static final int SERVICE_FEE_RATE = 3;
+    private static final Object FINANCE_RECONCILE_LOCK = new Object();
     private final OfferRepository offerRepository;
     private final MoneyTransactionRepository moneyTransactionRepository;
     private final ShipmentRepository shipmentRepository;
@@ -36,13 +42,17 @@ public class FinanceService {
         this.notificationService = notificationService;
     }
 
+    @Transactional
     public FinanceDtos.FinanceSummaryResponse getSummary(User user) {
+        reconcileFinanceTransactionsSafely();
+
         List<MoneyTransaction> transactions;
         if (user.getRole() == UserRole.ADMIN) {
             transactions = moneyTransactionRepository.findAll();
         } else {
             transactions = moneyTransactionRepository.findByUserOrderByCreatedAtDesc(user);
         }
+        transactions = deduplicateForDisplay(transactions);
 
         int totalSpent = 0;
         int totalGrossEarned = 0;
@@ -75,7 +85,7 @@ public class FinanceService {
         ).count();
 
         List<FinanceDtos.MoneyTransactionResponse> recent = transactions.stream()
-                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .sorted((a, b) -> safeCreatedAt(b).compareTo(safeCreatedAt(a)))
                 .limit(8)
                 .map(this::toResponse)
                 .toList();
@@ -94,69 +104,200 @@ public class FinanceService {
                 .build();
     }
 
+    @Transactional
     public List<FinanceDtos.MoneyTransactionResponse> getTransactions(User user) {
+        reconcileFinanceTransactionsSafely();
+
         List<MoneyTransaction> transactions = user.getRole() == UserRole.ADMIN
                 ? moneyTransactionRepository.findAll()
                 : moneyTransactionRepository.findByUserOrderByCreatedAtDesc(user);
-        return transactions.stream()
-                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+        return deduplicateForDisplay(transactions).stream()
+                .sorted((a, b) -> safeCreatedAt(b).compareTo(safeCreatedAt(a)))
                 .map(this::toResponse)
                 .toList();
     }
 
     @Transactional
     public void settleCompletedShipment(Shipment shipment) {
-        if (shipment == null || shipment.getAcceptedOfferId() == null || moneyTransactionRepository.existsByShipment(shipment)) {
+        if (shipment == null) {
             return;
         }
-        var accepted = shipment.getAcceptedOfferId();
-        var offer = shipment.getAcceptedOfferId() == null ? null : shipment.getAcceptedOfferId();
+
+        Offer acceptedOffer = resolveAcceptedOffer(shipment);
+        User adminUser = findAdminUser();
+        reconcileShipmentTransactions(shipment, acceptedOffer, adminUser);
     }
 
     @Transactional
     public void settleCompletedShipment(Shipment shipment, Offer acceptedOffer, User adminUser) {
-        if (shipment == null || acceptedOffer == null || moneyTransactionRepository.existsByShipment(shipment)) {
+        if (shipment == null) {
             return;
         }
 
-        int grossAmount = acceptedOffer.getPrice() == null ? 0 : acceptedOffer.getPrice();
-        int feeAmount = (int) Math.floor(grossAmount * (SERVICE_FEE_RATE / 100.0));
-        int netAmount = grossAmount - feeAmount;
+        reconcileShipmentTransactions(shipment, acceptedOffer, adminUser);
+    }
 
-        if (!moneyTransactionRepository.existsByShipmentAndType(shipment, TransactionType.SPEND)) {
-            moneyTransactionRepository.save(MoneyTransaction.builder()
-                    .user(shipment.getShipper())
-                    .shipment(shipment)
-                    .type(TransactionType.SPEND)
-                    .grossAmount(grossAmount)
-                    .feeAmount(0)
-                    .netAmount(grossAmount)
-                    .description("배차 완료 결제")
-                    .build());
+    private void reconcileFinanceTransactionsSafely() {
+        synchronized (FINANCE_RECONCILE_LOCK) {
+            reconcileCompletedShipmentTransactions();
+            moneyTransactionRepository.flush();
+        }
+    }
+
+    private List<MoneyTransaction> deduplicateForDisplay(List<MoneyTransaction> transactions) {
+        Map<String, MoneyTransaction> uniqueMap = new LinkedHashMap<>();
+
+        transactions.stream()
+                .sorted(Comparator.comparing(MoneyTransaction::getId, Comparator.nullsLast(Long::compareTo)))
+                .forEach(tx -> uniqueMap.putIfAbsent(transactionDisplayKey(tx), tx));
+
+        return new ArrayList<>(uniqueMap.values());
+    }
+
+    private String transactionDisplayKey(MoneyTransaction tx) {
+        Long shipmentId = tx.getShipment() != null ? tx.getShipment().getId() : null;
+        String type = tx.getType() != null ? tx.getType().name() : "UNKNOWN";
+        if (shipmentId == null) {
+            return "TX-" + tx.getId() + "-" + type;
+        }
+        return "SHIPMENT-" + shipmentId + "-" + type;
+    }
+
+    private java.time.LocalDateTime safeCreatedAt(MoneyTransaction tx) {
+        return tx.getCreatedAt() != null ? tx.getCreatedAt() : java.time.LocalDateTime.MIN;
+    }
+
+    private void reconcileCompletedShipmentTransactions() {
+        User adminUser = findAdminUser();
+        List<Shipment> completedShipments = shipmentRepository.findAll().stream()
+                .filter(shipment -> shipment.getStatus() == ShipmentStatus.COMPLETED)
+                .toList();
+
+        for (Shipment shipment : completedShipments) {
+            reconcileShipmentTransactions(shipment, resolveAcceptedOffer(shipment), adminUser);
+        }
+    }
+
+    private User findAdminUser() {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getRole() == UserRole.ADMIN)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Offer resolveAcceptedOffer(Shipment shipment) {
+        if (shipment == null || shipment.getAcceptedOfferId() == null) {
+            return null;
+        }
+
+        return offerRepository.findById(shipment.getAcceptedOfferId()).orElse(null);
+    }
+
+    private void reconcileShipmentTransactions(Shipment shipment, Offer acceptedOffer, User adminUser) {
+        if (shipment == null || shipment.getStatus() != ShipmentStatus.COMPLETED) {
+            return;
+        }
+
+        int grossAmount = acceptedOffer != null && acceptedOffer.getPrice() != null
+                ? acceptedOffer.getPrice()
+                : nvl(shipment.getAgreedPrice());
+        int feeAmount = (int) Math.floor(grossAmount * (SERVICE_FEE_RATE / 100.0));
+        int netAmount = Math.max(grossAmount - feeAmount, 0);
+        String paymentMethod = shipment.getPaymentMethod();
+
+        if (shipment.getShipper() != null) {
+            ensureSingleTransaction(
+                    shipment,
+                    shipment.getShipper(),
+                    TransactionType.SPEND,
+                    grossAmount,
+                    0,
+                    grossAmount,
+                    shipment.isPaid() ? "운송 결제 완료" : "배차 완료 결제",
+                    paymentMethod
+            );
         }
 
         if (shipment.getAssignedDriver() != null) {
-            moneyTransactionRepository.save(MoneyTransaction.builder()
-                    .user(shipment.getAssignedDriver())
-                    .shipment(shipment)
-                    .type(TransactionType.EARN)
-                    .grossAmount(grossAmount)
-                    .feeAmount(feeAmount)
-                    .netAmount(netAmount)
-                    .description("운행 완료 정산")
-                    .build());
+            ensureSingleTransaction(
+                    shipment,
+                    shipment.getAssignedDriver(),
+                    TransactionType.EARN,
+                    grossAmount,
+                    feeAmount,
+                    netAmount,
+                    "운행 완료 정산",
+                    paymentMethod
+            );
         }
 
         if (adminUser != null) {
-            moneyTransactionRepository.save(MoneyTransaction.builder()
-                    .user(adminUser)
+            ensureSingleTransaction(
+                    shipment,
+                    adminUser,
+                    TransactionType.FEE,
+                    grossAmount,
+                    feeAmount,
+                    feeAmount,
+                    "플랫폼 수수료 수익",
+                    paymentMethod
+            );
+        }
+    }
+
+    private void ensureSingleTransaction(Shipment shipment, User user, TransactionType type, int grossAmount, int feeAmount, int netAmount, String description, String paymentMethod) {
+        List<MoneyTransaction> transactions = new ArrayList<>(moneyTransactionRepository.findByShipmentAndTypeOrderByCreatedAtAsc(shipment, type));
+
+        MoneyTransaction primary;
+        if (transactions.isEmpty()) {
+            primary = MoneyTransaction.builder()
+                    .user(user)
                     .shipment(shipment)
-                    .type(TransactionType.FEE)
+                    .type(type)
                     .grossAmount(grossAmount)
                     .feeAmount(feeAmount)
-                    .netAmount(feeAmount)
-                    .description("플랫폼 수수료 수익")
-                    .build());
+                    .netAmount(netAmount)
+                    .description(description)
+                    .paymentMethod(paymentMethod)
+                    .build();
+        } else {
+            primary = transactions.get(0);
+        }
+
+        boolean changed = transactions.isEmpty();
+
+        if (primary.getUser() == null || !Objects.equals(primary.getUser().getId(), user.getId())) {
+            primary.setUser(user);
+            changed = true;
+        }
+        if (!Objects.equals(primary.getGrossAmount(), grossAmount)) {
+            primary.setGrossAmount(grossAmount);
+            changed = true;
+        }
+        if (!Objects.equals(primary.getFeeAmount(), feeAmount)) {
+            primary.setFeeAmount(feeAmount);
+            changed = true;
+        }
+        if (!Objects.equals(primary.getNetAmount(), netAmount)) {
+            primary.setNetAmount(netAmount);
+            changed = true;
+        }
+        if (!Objects.equals(primary.getDescription(), description)) {
+            primary.setDescription(description);
+            changed = true;
+        }
+        if (!Objects.equals(primary.getPaymentMethod(), paymentMethod)) {
+            primary.setPaymentMethod(paymentMethod);
+            changed = true;
+        }
+
+        if (changed) {
+            moneyTransactionRepository.save(primary);
+        }
+
+        if (transactions.size() > 1) {
+            moneyTransactionRepository.deleteAllInBatch(transactions.subList(1, transactions.size()));
+            moneyTransactionRepository.flush();
         }
     }
 

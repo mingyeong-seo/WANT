@@ -7,6 +7,7 @@ import AdminFinanceTab from './tabs/AdminFinanceTab'
 import AdminInquiriesTab from './tabs/AdminInquiriesTab'
 import AdminIssuesTab from './tabs/AdminIssuesTab'
 import AdminMembersTab from './tabs/AdminMembersTab'
+import AdminPenaltyTab from './tabs/AdminPenaltyTab'
 import AdminNoticesTab from './tabs/AdminNoticesTab'
 import AdminOverviewTab from './tabs/AdminOverviewTab'
 import AdminAssistantTab from './tabs/AdminAssistantTab'
@@ -16,6 +17,7 @@ import AdminShipmentsTab from './tabs/AdminShipmentsTab'
 const TAB_COMPONENTS = {
   overview: AdminOverviewTab,
   members: AdminMembersTab,
+  penalties: AdminPenaltyTab,
   shipments: AdminShipmentsTab,
   finance: AdminFinanceTab,
   ratings: AdminRatingsTab,
