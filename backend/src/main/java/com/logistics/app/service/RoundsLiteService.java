@@ -125,7 +125,7 @@ public class RoundsLiteService {
     public GameDtos.RoundsLiteRoomResponse joinMatchmaking(User user) {
         detachUserFromExistingRoom(user.getId());
 
-        List<RoundsLiteRoom> waitingRooms = roomRepository.findByMatchmakingRoomTrueOrderByCreatedAtAsc();
+        List<RoundsLiteRoom> waitingRooms = roomRepository.findMatchmakingRoomsForUpdate();
         for (RoundsLiteRoom room : waitingRooms) {
             simulateRoom(room);
             if (room.getPlayers().size() != 1) {
@@ -359,20 +359,28 @@ public class RoundsLiteService {
     }
 
     private void detachUserFromExistingRoom(Long userId) {
-        Optional<RoundsLitePlayer> existing = playerRepository.findByUserId(userId);
-        if (existing.isEmpty()) {
+        List<RoundsLitePlayer> existingPlayers = playerRepository.findAllByUserId(userId);
+        if (existingPlayers.isEmpty()) {
             return;
         }
-        RoundsLitePlayer player = existing.get();
-        RoundsLiteRoom room = player.getRoom();
-        room.getPlayers().removeIf(item -> Objects.equals(item.getUser().getId(), userId));
-        if (room.getPlayers().isEmpty()) {
-            roomRepository.delete(room);
-            return;
+
+        Set<RoundsLiteRoom> rooms = existingPlayers.stream()
+                .map(RoundsLitePlayer::getRoom)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        for (RoundsLiteRoom room : rooms) {
+            room.getPlayers().removeIf(item -> Objects.equals(item.getUser().getId(), userId));
+
+            if (room.getPlayers().isEmpty()) {
+                roomRepository.delete(room);
+                continue;
+            }
+
+            normalizeSeats(room);
+            resetRoomAfterLeave(room);
+            roomRepository.saveAndFlush(room);
         }
-        normalizeSeats(room);
-        resetRoomAfterLeave(room);
-        roomRepository.saveAndFlush(room);
     }
 
     private void resetRoomAfterLeave(RoundsLiteRoom room) {
@@ -545,64 +553,53 @@ public class RoundsLiteService {
             player.setFacingRight(vx > 0d);
         }
 
-        if (Boolean.TRUE.equals(player.getDropPressed()) && Boolean.TRUE.equals(player.getOnGround()) && isStandingOnDropPlatform(player)) {
-            player.setY(player.getY() + 6d);
-            player.setVy(80d);
-            player.setOnGround(false);
-            player.setDropThroughUntil(LocalDateTime.now().plusNanos(260_000_000L));
-        } else if (Boolean.TRUE.equals(player.getJumpPressed()) && Boolean.TRUE.equals(player.getOnGround())) {
+        if (Boolean.TRUE.equals(player.getJumpPressed()) && Boolean.TRUE.equals(player.getOnGround())) {
             player.setVy(-player.getJumpPower());
             player.setOnGround(false);
         }
+
+        double previousX = player.getX();
+        double previousY = player.getY();
 
         player.setVy(player.getVy() + GRAVITY * dt);
         player.setX(clamp(player.getX() + player.getVx() * dt, 0d, ARENA_WIDTH - PLAYER_WIDTH));
         player.setY(player.getY() + player.getVy() * dt);
 
-        resolveVerticalCollision(player);
+        resolveVerticalCollision(player, previousX, previousY, dt);
     }
 
-    private void resolveVerticalCollision(RoundsLitePlayer player) {
-        List<Platform> platforms = platforms(player.getRoom());
+    private void resolveVerticalCollision(RoundsLitePlayer player, double previousX, double previousY, double dt) {
+        /*
+         * 캐릭터-발판 상호작용은 "밟고 있을 때 아래로 떨어지지 않게 하는 처리"만 남긴다.
+         * 옆면 충돌, 밀어내기, 끼임 방지, 위로 보정, 아래 방향키 드롭스루는 모두 제거했다.
+         */
         boolean grounded = false;
-        LocalDateTime now = LocalDateTime.now();
-        boolean ignoreDropPlatforms = player.getDropThroughUntil() != null && now.isBefore(player.getDropThroughUntil());
-        for (Platform platform : platforms) {
-            if (platform.bulletOnly()) {
-                continue;
-            }
-            if (platform.oneWay() && ignoreDropPlatforms) {
-                continue;
-            }
-            double playerBottom = player.getY() + PLAYER_HEIGHT;
-            double previousBottom = playerBottom - player.getVy() * TICK_SECONDS;
-            boolean overlapsX = player.getX() + PLAYER_WIDTH > platform.x && player.getX() < platform.x + platform.w;
-            if (overlapsX && player.getVy() >= 0d && previousBottom <= platform.y && playerBottom >= platform.y) {
-                player.setY(platform.y - PLAYER_HEIGHT);
-                player.setVy(0d);
-                grounded = true;
+        double previousBottom = previousY + PLAYER_HEIGHT;
+        double currentBottom = player.getY() + PLAYER_HEIGHT;
+        double centerX = player.getX() + PLAYER_WIDTH * 0.5d;
+
+        if (player.getVy() >= 0d) {
+            for (Platform platform : platforms(player.getRoom())) {
+                if (platform.bulletOnly()) {
+                    continue;
+                }
+
+                boolean footIsOverPlatform = centerX >= platform.x && centerX <= platform.x + platform.w;
+                boolean crossedPlatformTop = previousBottom <= platform.y && currentBottom >= platform.y;
+
+                if (footIsOverPlatform && crossedPlatformTop) {
+                    player.setY(platform.y - PLAYER_HEIGHT);
+                    player.setVy(0d);
+                    grounded = true;
+                    break;
+                }
             }
         }
+
         if (grounded) {
             player.setDropThroughUntil(null);
         }
         player.setOnGround(grounded);
-    }
-
-    private boolean isStandingOnDropPlatform(RoundsLitePlayer player) {
-        double playerBottom = player.getY() + PLAYER_HEIGHT;
-        double centerX = player.getX() + PLAYER_WIDTH * 0.5d;
-        for (Platform platform : platforms(player.getRoom())) {
-            if (platform.bulletOnly() || !platform.oneWay()) {
-                continue;
-            }
-            boolean withinX = centerX >= platform.x && centerX <= platform.x + platform.w;
-            boolean standingY = Math.abs(playerBottom - platform.y) <= 6d;
-            if (withinX && standingY) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void maybeFireProjectile(RoundsLitePlayer player, RoundsLiteRoom room, List<ProjectileState> projectiles) {
@@ -1031,7 +1028,8 @@ public class RoundsLiteService {
     }
 
     private SpawnPoint spawnPointForSeat(MapDefinition map, String seat) {
-        double spawnX = "P1".equals(seat) ? 145d : ARENA_WIDTH - 145d - PLAYER_WIDTH;
+        double spawnMargin = 40d;
+        double spawnX = "P1".equals(seat) ? spawnMargin : ARENA_WIDTH - spawnMargin - PLAYER_WIDTH;
         double centerX = spawnX + PLAYER_WIDTH * 0.5d;
         double supportY = FLOOR_Y;
         for (Platform platform : map.platforms()) {
