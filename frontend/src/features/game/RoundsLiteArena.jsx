@@ -181,7 +181,12 @@ export default function RoundsLiteArena({ controller }) {
     const savedRoom = localStorage.getItem(LAST_ROOM_KEY)
     if (savedRoom) {
       setRoomCodeInput(savedRoom)
-      fetchState(savedRoom, true)
+      fetchState(savedRoom, true).catch(() => {
+        localStorage.removeItem(LAST_ROOM_KEY)
+        setRoomCodeInput('')
+        setRoom(null)
+        setDisplayRoom(null)
+      })
     }
 
     return () => {
@@ -300,6 +305,7 @@ export default function RoundsLiteArena({ controller }) {
   }
 
   async function handleCreateRoom() {
+    if (actionInFlightRef.current) return
     actionInFlightRef.current = true
     setLoading(true)
     setError('')
@@ -317,6 +323,8 @@ export default function RoundsLiteArena({ controller }) {
   }
 
   async function handleJoinRoom() {
+    if (actionInFlightRef.current) return
+
     const trimmed = roomCodeInput.trim().toUpperCase()
     if (!trimmed) {
       setError('방 코드를 입력하세요.')
@@ -341,6 +349,7 @@ export default function RoundsLiteArena({ controller }) {
   }
 
   async function handleMatchmaking() {
+    if (actionInFlightRef.current) return
     actionInFlightRef.current = true
     setLoading(true)
     setError('')
@@ -359,6 +368,7 @@ export default function RoundsLiteArena({ controller }) {
   }
 
   async function handleCancelMatchmaking() {
+    if (actionInFlightRef.current) return
     if (!room?.roomCode) return
 
     actionInFlightRef.current = true
@@ -381,6 +391,7 @@ export default function RoundsLiteArena({ controller }) {
   }
 
   async function handleReady() {
+    if (actionInFlightRef.current) return
     if (!room?.roomCode) return
 
     actionInFlightRef.current = true
@@ -441,6 +452,7 @@ export default function RoundsLiteArena({ controller }) {
   }
 
   async function handleReset() {
+    if (actionInFlightRef.current) return
     if (!room?.roomCode) return
 
     actionInFlightRef.current = true

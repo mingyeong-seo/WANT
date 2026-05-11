@@ -19,4 +19,14 @@ public interface RoundsLiteRoomRepository extends JpaRepository<RoundsLiteRoom, 
     Optional<RoundsLiteRoom> findByRoomCodeForUpdate(@Param("roomCode") String roomCode);
 
     List<RoundsLiteRoom> findByMatchmakingRoomTrueOrderByCreatedAtAsc();
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select distinct r
+            from RoundsLiteRoom r
+            left join fetch r.players
+            where r.matchmakingRoom = true
+            order by r.createdAt asc
+            """)
+    List<RoundsLiteRoom> findMatchmakingRoomsForUpdate();
 }

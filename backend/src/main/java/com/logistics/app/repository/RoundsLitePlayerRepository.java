@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface RoundsLitePlayerRepository extends JpaRepository<RoundsLitePlayer, Long> {
     Optional<RoundsLitePlayer> findByUserId(Long userId);
+    List<RoundsLitePlayer> findAllByUserId(Long userId);
     List<RoundsLitePlayer> findByRoomRoomCodeOrderBySeatAsc(String roomCode);
 }

@@ -125,7 +125,7 @@ public class RoundsLiteService {
     public GameDtos.RoundsLiteRoomResponse joinMatchmaking(User user) {
         detachUserFromExistingRoom(user.getId());
 
-        List<RoundsLiteRoom> waitingRooms = roomRepository.findByMatchmakingRoomTrueOrderByCreatedAtAsc();
+        List<RoundsLiteRoom> waitingRooms = roomRepository.findMatchmakingRoomsForUpdate();
         for (RoundsLiteRoom room : waitingRooms) {
             simulateRoom(room);
             if (room.getPlayers().size() != 1) {
@@ -359,20 +359,28 @@ public class RoundsLiteService {
     }
 
     private void detachUserFromExistingRoom(Long userId) {
-        Optional<RoundsLitePlayer> existing = playerRepository.findByUserId(userId);
-        if (existing.isEmpty()) {
+        List<RoundsLitePlayer> existingPlayers = playerRepository.findAllByUserId(userId);
+        if (existingPlayers.isEmpty()) {
             return;
         }
-        RoundsLitePlayer player = existing.get();
-        RoundsLiteRoom room = player.getRoom();
-        room.getPlayers().removeIf(item -> Objects.equals(item.getUser().getId(), userId));
-        if (room.getPlayers().isEmpty()) {
-            roomRepository.delete(room);
-            return;
+
+        Set<RoundsLiteRoom> rooms = existingPlayers.stream()
+                .map(RoundsLitePlayer::getRoom)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        for (RoundsLiteRoom room : rooms) {
+            room.getPlayers().removeIf(item -> Objects.equals(item.getUser().getId(), userId));
+
+            if (room.getPlayers().isEmpty()) {
+                roomRepository.delete(room);
+                continue;
+            }
+
+            normalizeSeats(room);
+            resetRoomAfterLeave(room);
+            roomRepository.saveAndFlush(room);
         }
-        normalizeSeats(room);
-        resetRoomAfterLeave(room);
-        roomRepository.saveAndFlush(room);
     }
 
     private void resetRoomAfterLeave(RoundsLiteRoom room) {
