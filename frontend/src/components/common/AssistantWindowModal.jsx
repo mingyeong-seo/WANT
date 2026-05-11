@@ -173,15 +173,6 @@ export default function AssistantWindowModal({
           <div className="assistant-modal__headActions">
             <button
               type="button"
-              className="assistant-reset-button"
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={() => onQuickAction?.("처음")}
-            >
-              처음으로
-            </button>
-
-            <button
-              type="button"
               className="modal-close"
               onPointerDown={(e) => e.stopPropagation()}
               onClick={onClose}
