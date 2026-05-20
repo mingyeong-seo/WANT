@@ -15,7 +15,7 @@ export function buildUserAlerts(role, shipments, selected) {
   return [
     { title: '입찰 가능한 배차', value: `${bidding.length}건`, desc: '입찰중 상태의 공개 배차에 바로 제안할 수 있습니다.' },
     { title: '내가 맡은 운행', value: `${assigned.length}건`, desc: '확정된 건만 운송 시작과 완료 버튼이 열립니다.' },
-    { title: '완료 가능 건', value: `${completable.length}건`, desc: '예상 도착 시간이 지난 건만 완료 처리됩니다.' },
+    { title: '완료 가능 건', value: `${completable.length}건`, desc: '완료 사진을 등록하면 운송 완료 처리할 수 있습니다.' },
   ]
 }
 

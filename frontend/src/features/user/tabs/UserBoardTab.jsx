@@ -672,26 +672,16 @@ export default function UserBoardTab({ controller }) {
                         <button
                           className="btn btn-primary"
                           onClick={handleComplete}
-                          disabled={
-                            !selected.tracking?.completable ||
-                            !completionProof.dataUrl
-                          }
+                          disabled={!completionProof.dataUrl}
                         >
                           운송 완료
                         </button>
 
-                        {!selected.tracking?.completable && (
+                        {!completionProof.dataUrl && (
                           <small>
-                            예상 도착 시간이 지나야 완료 가능합니다.
+                            완료 사진을 등록하면 완료 버튼이 활성화됩니다.
                           </small>
                         )}
-
-                        {selected.tracking?.completable &&
-                          !completionProof.dataUrl && (
-                            <small>
-                              완료 사진을 등록하면 완료 버튼이 활성화됩니다.
-                            </small>
-                          )}
                       </>
                     )}
                   </div>

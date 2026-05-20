@@ -7,7 +7,16 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-api.interceptors.request.use((config) => {
+const clearAuthStorage = () => {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('token');
+  localStorage.removeItem('member');
+  localStorage.removeItem('userId');
+  localStorage.removeItem('role');
+  document.cookie = 'member=; Max-Age=0; path=/';
+};
+
+const getStoredToken = () => {
   let token =
     localStorage.getItem('accessToken') ||
     localStorage.getItem('token');
@@ -15,10 +24,20 @@ api.interceptors.request.use((config) => {
   if (!token) {
     const member = localStorage.getItem('member');
     if (member) {
-      const parsed = JSON.parse(member);
-      token = parsed.accessToken || parsed.token;
+      try {
+        const parsed = JSON.parse(member);
+        token = parsed.accessToken || parsed.token;
+      } catch (error) {
+        clearAuthStorage();
+      }
     }
   }
+
+  return token;
+};
+
+api.interceptors.request.use((config) => {
+  const token = getStoredToken();
 
   if (config.skipAuth) {
     delete config.headers.Authorization;
@@ -28,6 +47,24 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const requestUrl = error?.config?.url || '';
+    const hasToken = Boolean(getStoredToken());
+    const isAuthRequest = requestUrl.startsWith('/auth/');
+
+    if ((status === 401 || status === 403) && hasToken && !isAuthRequest) {
+      clearAuthStorage();
+      window.alert('로그인이 만료되었습니다. 다시 로그인해 주세요.');
+      window.location.href = '/';
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export const login = async (payload) =>
   (await api.post('/auth/login', payload)).data;
@@ -179,7 +216,7 @@ export const updateMemberStatus = async (memberId, status) =>
   (await api.patch(`/api/admin/members/${memberId}/status`, { status })).data;
 
 export const updateMemberPenalty = async (memberId, payload) =>
-  (await api.patch(`/api/admin/members/${memberId}/status`, payload)).data;
+  (await api.patch(`/api/admin/members/${memberId}/penalty`, payload)).data;
 
 export const fetchAdminShipments = async () =>
   (await api.get('/api/admin/shipments')).data;

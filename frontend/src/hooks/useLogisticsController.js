@@ -372,8 +372,8 @@ export function useLogisticsController() {
   const [authMode, setAuthMode] = useState("");
 
   const [loginForm, setLoginForm] = useState({
-    email: "shipper@test.com",
-    password: "1111",
+    email: "",
+    password: "",
   });
   const [signupForm, setSignupForm] = useState(emptySignup);
   const [publicData, setPublicData] = useState({

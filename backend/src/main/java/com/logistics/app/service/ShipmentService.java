@@ -305,10 +305,6 @@ public class ShipmentService {
         if (shipment.getAssignedDriver() == null || !shipment.getAssignedDriver().getId().equals(driver.getId())) {
             throw new RuntimeException("배정된 차주만 완료할 수 있습니다.");
         }
-        int remainingMinutes = locationLogRepository.findTopByShipmentOrderByCreatedAtDesc(shipment).map(LocationLog::getRemainingMinutes).orElse(shipment.getEstimatedMinutes());
-        if (!isCompletable(shipment, remainingMinutes)) {
-            throw new RuntimeException("예상 도착 시간 이전에는 완료할 수 없습니다.");
-        }
         if (request == null || request.getCompletionImageDataUrl() == null || request.getCompletionImageDataUrl().isBlank()) {
             throw new RuntimeException("배송 완료 사진을 등록해야 완료 처리할 수 있습니다.");
         }
