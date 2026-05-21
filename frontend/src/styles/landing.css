@@ -1101,7 +1101,10 @@ body.theme-admin .app-logo__image {
   transform: translateY(0);
 }
 
-@media (max-width: 1200px) {
+/* =========================
+   Tablet Landscape
+========================= */
+@media (max-width: 1024px) {
 
   .landing-hero__inner,
   .landing-accessBand__inner,
@@ -1111,22 +1114,17 @@ body.theme-admin .app-logo__image {
     grid-template-columns: 1fr;
   }
 
-  .landing-visualCard {
-    min-height: 460px;
-  }
-
-  /* 추가 */
-  .landing-hero__visual {
-    opacity: 0;
-    transform: none;
-    max-width: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
   .landing-hero__inner {
-    grid-template-columns: 1fr;
-    transition: all 0.5s ease;
+    min-height: auto;
+    gap: 20px;
+  }
+
+  .landing-hero {
+    min-height: auto;
+    padding-top: 36px;
+    padding-bottom: 220px;
+    overflow: hidden;
+    position: relative;
   }
 
   .landing-hero__visual {
@@ -1134,179 +1132,35 @@ body.theme-admin .app-logo__image {
   }
 
   .landing-hero__copy {
-    order: 1;
+    width: 100%;
+  }
+
+  .landing-hero__overlay,
+  .landing-hero__bg {
+    inset: 0;
+    height: 100%;
   }
 
   .landing-stats {
-    order: 2;
-    margin-top: -200px;
+    position: relative;
+    z-index: 2;
+    margin-top: -160px;
   }
 
-  .landing-hero__inner {
-    min-height: 50vh;
+  .public-directory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 920px) {
+/* =========================
+   Tablet / Mobile
+========================= */
+@media (max-width: 768px) {
+
   .landing-header__inner {
     min-height: auto;
     padding-top: 16px;
     padding-bottom: 16px;
-    flex-wrap: wrap;
-  }
-
-  /* .landing-nav {
-    order: 3;
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  } */
-
-  .landing-nav {
-    flex: 1;
-    min-width: 0;
-    justify-content: center;
-    padding-bottom: 0;
-    order: 0;
-    width: auto;
-  }
-
-  /* .landing-hero {
-    min-height: auto;
-    padding-top: 28px;
-  } */
-
-  .landing-hero {
-    min-height: 750px;
-    padding-bottom: 0;
-    overflow: visible;
-  }
-
-  .landing-hero__copy h1 {
-    font-size: clamp(34px, 11vw, 58px);
-  }
-
-  .landing-hero__copy p,
-  .landing-sectionHead p,
-  .landing-accessBand__copy p {
-    font-size: 15px;
-  }
-
-  .landing-stats__inner,
-  .landing-boardAside__stats,
-  .landing-hero__summary {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .landing-infoGrid,
-  .landing-solutionGrid,
-  .landing-accessBand__inner,
-  .landing-boardGrid,
-  .landing-hero__inner {
-    gap: 16px;
-    align-items: start;
-  }
-
-  .landing-hero__overlay {
-    inset: auto;
-    top: 0;
-    left: 0;
-    right: 0;
-    inset: 0;
-    z-index: 0;
-  }
-
-  .landing-hero__inner {
-    min-height: auto;
-  }
-
-  .landing-hero__overlay,
-  .landing-hero__bg {
-    inset: 0;
-    height: 90%;
-  }
-
-  .landing-stats {
-    margin-top: -350px;
-  }
-}
-
-@media (max-width: 640px) {
-  .landing-header__actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .landing-brand__text strong {
-    font-size: 17px;
-  }
-
-  .landing-hero__actions,
-  .landing-authCard__actions,
-  .landing-stats__inner,
-  .landing-boardAside__stats,
-  .landing-hero__summary,
-  .landing-split2 {
-    grid-template-columns: 1fr;
-  }
-
-  .landing-hero__actions,
-  .landing-authCard__actions,
-  .landing-filterRow {
-    flex-wrap: wrap;
-  }
-
-  .landing-btn,
-  .landing-text-btn,
-  .landing-nav button {
-    width: 100%;
-  }
-
-  .landing-boardTable {
-    min-width: 880px;
-  }
-
-  .landing-visualCard {
-    min-height: 360px;
-    border-radius: 28px;
-  }
-
-  .landing-visualCard__orb {
-    width: 70px;
-    height: 70px;
-    font-size: 13px;
-  }
-
-  .landing-authCard,
-  .landing-boardAside,
-  .landing-infoPanel,
-  .landing-solutionGrid article,
-  .landing-statItem,
-  .landing-hero__summary div {
-    border-radius: 24px;
-  }
-
-  .landing-hero {
-    min-height: 830px;
-    overflow: visible;
-    position: relative;
-  }
-
-  .landing-hero__overlay,
-  .landing-hero__bg {
-    inset: 0;
-    height: calc(100% + 110px);
-  }
-
-  .landing-stats {
-    margin-top: -420px;
-  }
-
-  .landing-btn {
-    width: auto;
-  }
-
-  .landing-header__inner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -1336,6 +1190,358 @@ body.theme-admin .app-logo__image {
   .landing-nav button {
     width: auto;
     flex: 0 0 auto;
+  }
+
+  .landing-hero {
+    padding-top: 28px;
+    padding-bottom: 260px;
+  }
+
+  .landing-hero__copy h1 {
+    font-size: clamp(34px, 11vw, 58px);
+  }
+
+  .landing-hero__copy p,
+  .landing-sectionHead p,
+  .landing-accessBand__copy p {
+    font-size: 15px;
+  }
+
+  .landing-infoGrid,
+  .landing-solutionGrid,
+  .landing-accessBand__inner,
+  .landing-boardGrid,
+  .landing-hero__inner {
+    gap: 16px;
+    align-items: start;
+  }
+
+  .landing-stats__inner,
+  .landing-boardAside__stats,
+  .landing-hero__summary {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .landing-hero__actions,
+  .landing-authCard__actions,
+  .landing-filterRow {
+    flex-wrap: wrap;
+  }
+
+  .public-directory-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-directory-search__controls,
+  .public-directory-card__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-stats {
+    margin-top: -190px;
+  }
+}
+
+
+/* =========================
+   Small Mobile
+========================= */
+@media (max-width: 480px) {
+
+  /* =========================
+     Common Layout
+  ========================= */
+  .landing-brand__text strong {
+    font-size: 17px;
+  }
+
+  .landing-sectionHead h2 {
+    font-size: 30px;
+    line-height: 1.2;
+  }
+
+  .landing-sectionHead p {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .landing-btn,
+  .landing-text-btn {
+    width: 100%;
+  }
+
+  .landing-boardTable {
+    min-width: 780px;
+  }
+
+  /* =========================
+     공통 섹션 좌우 패딩 제거
+     (inner가 실제 여백 담당)
+  ========================= */
+  .landing-solution,
+  .landing-board,
+  .landing-info,
+  .landing-accessBand {
+    padding-left: 0;
+    padding-right: 0;
+
+    padding-top: 64px;
+    padding-bottom: 0;
+  }
+
+  /* =========================
+     Common Inner Width
+  ========================= */
+  .landing-solution__inner,
+  .landing-board__inner,
+  .landing-info__inner,
+  .landing-accessBand__inner {
+    width: 100%;
+    max-width: 100%;
+
+    padding-left: 12px;
+    padding-right: 12px;
+
+    box-sizing: border-box;
+  }
+
+  /* =========================
+     공통 Width 기준 통일
+  ========================= */
+  .landing-solution>.landing-sectionHead,
+  .landing-solutionGrid,
+  .landing-board__inner>.landing-sectionHead,
+  .landing-board__inner>.landing-filterRow,
+  .landing-boardGrid,
+  .landing-info__inner>.landing-sectionHead,
+  .landing-infoGrid {
+    width: 100%;
+    max-width: 100%;
+
+    margin-left: 0;
+    margin-right: 0;
+
+    padding-left: 0;
+    padding-right: 0;
+
+    box-sizing: border-box;
+  }
+
+  /* =========================
+     Common Grid
+  ========================= */
+  .landing-hero__actions,
+  .landing-authCard__actions,
+  .landing-stats__inner,
+  .landing-boardAside__stats,
+  .landing-hero__summary,
+  .landing-split2,
+  .landing-public-directory-card__summaryStats {
+    grid-template-columns: 1fr;
+  }
+
+  /* =========================
+     Common Card Style
+  ========================= */
+  .landing-authCard,
+  .landing-boardAside,
+  .landing-infoPanel,
+  .landing-solutionGrid article,
+  .landing-statItem,
+  .landing-hero__summary div {
+    padding: 24px;
+    border-radius: 22px;
+    box-sizing: border-box;
+  }
+
+  /* =========================
+     Hero
+  ========================= */
+  .landing-hero {
+    min-height: auto;
+    padding-bottom: 270px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .landing-hero__overlay,
+  .landing-hero__bg {
+    inset: 0;
+    height: calc(100% + 260px);
+  }
+
+  .landing-hero__inner {
+    min-height: auto;
+    gap: 18px;
+  }
+
+  .landing-hero__visual {
+    display: none;
+    height: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .landing-stats {
+    margin-top: -250px;
+  }
+
+  /* =========================
+     Visual Card
+  ========================= */
+  .landing-visualCard {
+    min-height: 360px;
+    border-radius: 28px;
+  }
+
+  .landing-visualCard__orb {
+    width: 70px;
+    height: 70px;
+    font-size: 13px;
+  }
+
+  /* =========================
+     PLATFORM FLOW / INFO
+  ========================= */
+  .landing-solutionGrid,
+  .landing-infoGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 24px;
+    justify-items: center;
+  }
+
+  .landing-solutionGrid article,
+  .landing-boardAside,
+  .landing-infoPanel {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .landing-solution {
+    padding-left: 12px;
+    padding-right: 12px;
+    box-sizing: border-box;
+  }
+
+  .landing-solutionGrid article {
+    background: #ffffff;
+    backdrop-filter: none;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  /* =========================
+     LIVE BOARD
+  ========================= */
+  .landing-boardGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 18px;
+  }
+
+  .landing-board__inner>.landing-sectionHead,
+  .landing-board__inner>.landing-filterRow {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .landing-boardGrid>* {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .landing-filterRow {
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .landing-filterChip {
+    height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .landing-boardTableWrap {
+    border-radius: 22px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+  }
+
+  .landing-boardTableWrap::after {
+    content: "↔ 좌우로 스크롤";
+    display: block;
+    padding: 10px 16px 0;
+    font-size: 12px;
+    text-align: center;
+    color: var(--text-soft);
+  }
+
+  .landing-boardAside__head h3 {
+    font-size: 22px;
+  }
+
+  /* =========================
+     Pagination
+  ========================= */
+  .landing-pageButton {
+    min-width: 58px;
+    height: 34px;
+    padding: 0 10px;
+  }
+
+  .landing-pageNumber {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+  }
+
+  .landing-boardPagination {
+    gap: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    justify-content: center;
+  }
+
+  /* =========================
+     Public Directory
+  ========================= */
+  .public-directory-card {
+    padding: 18px 16px 16px;
+    border-radius: 24px;
+    gap: 14px;
+  }
+
+  .public-directory-card__topRow,
+  .public-directory-card__profileTrigger {
+    gap: 12px;
+  }
+
+  .public-directory-card__avatar {
+    width: 68px;
+    height: 68px;
+  }
+
+  .public-directory-card__profileText h3 {
+    font-size: 18px;
+  }
+
+  .public-directory-card__profileText span {
+    font-size: 12px;
+  }
+
+  .public-directory-card__summaryStats {
+    grid-template-columns: 1fr;
+  }
+
+  .public-directory-card__summaryStats>div+div {
+    border-left: 0;
+    border-top: 1px solid rgba(226, 232, 240, 0.9);
   }
 }
 
