@@ -194,7 +194,7 @@ export default function QuoteCard({ quote, onClickDetail }) {
             className="quote-card__detail-button"
             onClick={() => onClickDetail?.(quote.id)}
           >
-            상세보기 &gt;
+            <span>상세보기&gt;</span>
           </button>
         </div>
       </div>

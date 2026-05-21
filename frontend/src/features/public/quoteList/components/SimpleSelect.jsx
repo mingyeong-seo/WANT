@@ -16,14 +16,21 @@ export default function SimpleSelect({
       }
     };
 
+    const handleScroll = () => {
+      setOpen(false);
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("scroll", handleScroll, true);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScroll, true);
     };
   }, []);
 
   const handleSelect = (optionValue) => {
-    onChange(optionValue);
+    onChange?.(optionValue);
     setOpen(false);
   };
 
@@ -36,7 +43,9 @@ export default function SimpleSelect({
         className="simple-select-trigger"
         onClick={() => setOpen((prev) => !prev)}
       >
-        <span>{selectedOption ? selectedOption.label : ""}</span>
+        <span className="simple-select-label">
+          {selectedOption ? selectedOption.label : ""}
+        </span>
         <span className="simple-select-arrow">{open ? "▴" : "▾"}</span>
       </button>
 
