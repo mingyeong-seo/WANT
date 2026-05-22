@@ -377,7 +377,7 @@ body.theme-admin .app-logo__image {
 
 .landing-hero__bg,
 .landing-hero__overlay {
-  position: absolute;
+  /* position: absolute; */
   inset: 0;
 }
 
@@ -1102,53 +1102,223 @@ body.theme-admin .app-logo__image {
 }
 
 /* =========================
-   Tablet Landscape
+   Tablet Landscape (iPad Mini 포함)
 ========================= */
 @media (max-width: 1024px) {
 
+  /* =========================
+     SECTION CONTAINER UNIFY (핵심)
+  ========================= */
+  .landing-solution__inner,
+  .landing-board__inner,
+  .landing-info__inner,
+  .landing-accessBand__inner {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+    box-sizing: border-box;
+  }
+
+  /* =========================
+     SECTION HEAD (타이틀 위치 통일)
+  ========================= */
+  .landing-sectionHead {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* =========================
+     GRID SYSTEM UNIFY
+  ========================= */
   .landing-hero__inner,
   .landing-accessBand__inner,
   .landing-boardGrid,
   .landing-infoGrid,
   .landing-solutionGrid {
     grid-template-columns: 1fr;
-  }
-
-  .landing-hero__inner {
-    min-height: auto;
     gap: 20px;
+    align-items: start;
+    width: 100%;
   }
 
+  .landing-boardGrid,
+  .landing-infoGrid,
+  .landing-solutionGrid {
+    margin-top: 18px;
+  }
+
+  /* =========================
+     SECTION SPACING
+  ========================= */
+  .landing-solution,
+  .landing-board,
+  .landing-info,
+  .landing-accessBand {
+    padding-top: 72px;
+    padding-bottom: 0;
+  }
+
+  .landing-solution>.landing-sectionHead {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 12px;
+    box-sizing: border-box;
+  }
+
+  .landing-solutionGrid {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 12px;
+    box-sizing: border-box;
+    margin-top: 24px;
+    justify-items: center;
+  }
+
+  /* =========================
+     HERO
+  ========================= */
   .landing-hero {
     min-height: auto;
-    padding-top: 36px;
-    padding-bottom: 220px;
-    overflow: hidden;
+    padding-bottom: 240px;
+    overflow: visible;
     position: relative;
   }
 
-  .landing-hero__visual {
-    display: none;
+  .landing-hero__inner {
+    gap: 8px;
+    min-height: auto;
   }
 
   .landing-hero__copy {
     width: 100%;
+    max-width: 100%;
+  }
+
+  .landing-hero__copy h1 {
+    font-size: clamp(40px, 6vw, 64px);
+    line-height: 1.08;
+    margin-top: 10px;
+  }
+
+  .landing-hero__copy p {
+    font-size: 15.5px;
+    line-height: 1.7;
+    margin-top: 12px;
+  }
+
+  /* CTA */
+  .landing-hero__actions {
+    margin-top: 20px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* HERO SUMMARY */
+  .landing-hero__summary {
+    margin-top: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .landing-hero__summary div {
+    padding: 18px;
+    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 18px;
+    box-sizing: border-box;
+  }
+
+  /* HERO VISUAL OFF */
+  .landing-hero__visual {
+    display: none;
   }
 
   .landing-hero__overlay,
   .landing-hero__bg {
     inset: 0;
-    height: 100%;
+    bottom: -80px;
   }
 
+  /* =========================
+     STATS SECTION
+  ========================= */
   .landing-stats {
     position: relative;
     z-index: 2;
-    margin-top: -160px;
+    margin-top: -220px !important;
   }
 
+  .landing-stats__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .landing-statItem {
+    padding: 20px;
+    border-radius: 20px;
+    box-sizing: border-box;
+  }
+
+  .landing-statItem strong {
+    font-size: clamp(26px, 4.5vw, 36px);
+  }
+
+  /* =========================
+     PLATFORM FLOW / NOTICE CARDS (핵심)
+  ========================= */
+  .landing-solutionGrid article,
+  .landing-infoPanel {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  /* =========================
+     BOARD SIDE STATS
+  ========================= */
+  .landing-boardAside__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  /* =========================
+     FILTER ROW
+  ========================= */
+  .landing-filterRow {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* =========================
+     PUBLIC DIRECTORY
+  ========================= */
   .public-directory-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .public-directory-search__controls {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* =========================
+     TABLE
+  ========================= */
+  .landing-boardTableWrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -1544,6 +1714,7 @@ body.theme-admin .app-logo__image {
     border-top: 1px solid rgba(226, 232, 240, 0.9);
   }
 }
+
 
 .public-directory-shell {
   gap: 0;
