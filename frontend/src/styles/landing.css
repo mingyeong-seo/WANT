@@ -1320,6 +1320,50 @@ body.theme-admin .app-logo__image {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* =========================
+     Header
+  ========================= */
+  .landing-header__inner {
+    gap: 18px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .landing-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 8px;
+    padding-left: 24px;
+    padding-right: 24px;
+    box-sizing: border-box;
+  }
+
+  .landing-nav button {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  /* 헤더 안 로그인 버튼 */
+  .landing-header__actions .landing-btn {
+    height: 44px;
+    padding: 0 22px;
+    font-size: 14px;
+  }
+
+  .landing-brand .app-logo__mark {
+    width: 112px;
+    height: 44px;
+  }
 }
 
 /* =========================
@@ -1410,8 +1454,52 @@ body.theme-admin .app-logo__image {
   .landing-stats {
     margin-top: -190px;
   }
-}
 
+  /* =========================
+     Header
+  ========================= */
+  .landing-header__inner {
+    gap: 14px;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .landing-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 10px;
+    padding-left: 18px;
+    padding-right: 18px;
+    box-sizing: border-box;
+  }
+
+  .landing-nav button {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 8px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: normal;
+    word-break: keep-all;
+    text-align: center;
+  }
+
+  /* 헤더 안 로그인 버튼 */
+  .landing-header__actions .landing-btn {
+    height: 40px;
+    padding: 0 18px;
+    font-size: 14px;
+  }
+
+  .landing-brand .app-logo__mark {
+    width: 96px;
+    height: 38px;
+  }
+}
 
 /* =========================
    Small Mobile
@@ -1713,8 +1801,56 @@ body.theme-admin .app-logo__image {
     border-left: 0;
     border-top: 1px solid rgba(226, 232, 240, 0.9);
   }
-}
 
+  /* =========================
+     Header
+  ========================= */
+  .landing-header__inner {
+    gap: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .landing-nav {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 6px;
+    margin-top: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    box-sizing: border-box;
+  }
+
+  .landing-nav button {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 6px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: normal;
+    word-break: keep-all;
+    text-align: center;
+  }
+
+  /* 헤더 안 로그인 버튼 */
+  .landing-header__actions .landing-btn {
+    height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .landing-brand .app-logo__mark {
+    width: 84px;
+    height: 34px;
+  }
+
+  .landing-btn--mypage {
+    min-width: 105px;
+  }
+}
 
 .public-directory-shell {
   gap: 0;

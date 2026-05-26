@@ -187,12 +187,10 @@ textarea {
 }
 
 .hero-panel-dark {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--primary-dark) 94%, #000 6%) 0%,
-    var(--primary-dark) 60%,
-    color-mix(in srgb, var(--primary) 52%, var(--primary-dark) 48%) 100%
-  );
+  background: linear-gradient(135deg,
+      color-mix(in srgb, var(--primary-dark) 94%, #000 6%) 0%,
+      var(--primary-dark) 60%,
+      color-mix(in srgb, var(--primary) 52%, var(--primary-dark) 48%) 100%);
   color: #fff;
   border-color: color-mix(in srgb, var(--primary-dark) 80%, #fff 20%);
 }
@@ -227,11 +225,9 @@ textarea {
   width: 42px;
   height: 42px;
   border-radius: 8px;
-  background: linear-gradient(
-    180deg,
-    var(--primary-dark) 0%,
-    color-mix(in srgb, var(--primary) 40%, var(--primary-dark) 60%) 100%
-  );
+  background: linear-gradient(180deg,
+      var(--primary-dark) 0%,
+      color-mix(in srgb, var(--primary) 40%, var(--primary-dark) 60%) 100%);
   color: #fff;
   display: grid;
   place-items: center;
@@ -685,10 +681,10 @@ textarea {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.detail-stat-grid > div,
-.hero-kpis > div,
+.detail-stat-grid>div,
+.hero-kpis>div,
 .kpi-card,
-.side-mini-kpis > div {
+.side-mini-kpis>div {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: #fff;
@@ -700,7 +696,7 @@ textarea {
   margin-top: 18px;
 }
 
-.hero-kpis > div {
+.hero-kpis>div {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.12);
 }
@@ -823,11 +819,9 @@ textarea {
   border-radius: 10px;
   padding: 22px;
   border: 1px solid rgba(var(--accent-rgb), 0.18);
-  background: linear-gradient(
-    135deg,
-    rgba(var(--accent-rgb), 0.07) 0%,
-    rgba(255, 255, 255, 0.92) 72%
-  );
+  background: linear-gradient(135deg,
+      rgba(var(--accent-rgb), 0.07) 0%,
+      rgba(255, 255, 255, 0.92) 72%);
 }
 
 .role-banner h2 {
@@ -915,11 +909,9 @@ textarea {
 }
 
 .console-sidebar {
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--primary-dark) 94%, #000 6%) 0%,
-    color-mix(in srgb, var(--primary) 22%, var(--primary-dark) 78%) 100%
-  );
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--primary-dark) 94%, #000 6%) 0%,
+      color-mix(in srgb, var(--primary) 22%, var(--primary-dark) 78%) 100%);
   color: #fff;
   padding: 22px 18px;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -929,11 +921,9 @@ textarea {
 }
 
 .console-sidebar .identity-mark {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.06) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.06) 100%);
 }
 
 .console-sidebar strong {
@@ -983,7 +973,7 @@ textarea {
   margin-top: auto;
 }
 
-.side-mini-kpis > div {
+.side-mini-kpis>div {
   background: rgba(255, 255, 255, 0.04);
   border-color: rgba(255, 255, 255, 0.08);
 }
@@ -1271,11 +1261,9 @@ textarea {
 }
 
 .public-hero {
-  background: linear-gradient(
-    135deg,
-    #ffffff 0%,
-    rgba(var(--accent-rgb), 0.05) 100%
-  );
+  background: linear-gradient(135deg,
+      #ffffff 0%,
+      rgba(var(--accent-rgb), 0.05) 100%);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 26px;
@@ -1399,6 +1387,7 @@ textarea {
 }
 
 @media (max-width: 1320px) {
+
   .hero-grid,
   .public-board-grid,
   .detail-layout,
@@ -1458,6 +1447,7 @@ textarea {
 }
 
 @media (max-width: 768px) {
+
   .section-title-row h2,
   .console-topbar h1 {
     font-size: 20px;
@@ -1745,6 +1735,7 @@ label {
 }
 
 @media (max-width: 960px) {
+
   .transport-status-grid,
   .transport-status-bottom {
     grid-template-columns: 1fr;

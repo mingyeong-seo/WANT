@@ -56,7 +56,7 @@ export default function PublicHeader({
             type="button"
             onClick={() => moveToMain(controller, 'landing-solution')}
           >
-            서비스 소개
+            서비스
           </button>
 
           <button
@@ -70,7 +70,7 @@ export default function PublicHeader({
             type="button"
             onClick={() => moveToMain(controller, 'notice-faq')}
           >
-            FAQ · 문의
+            고객센터
           </button>
 
           <button
@@ -87,7 +87,7 @@ export default function PublicHeader({
           {isLoggedIn ? (
             <>
               <button
-                className="landing-btn landing-btn--light"
+                className="landing-btn landing-btn--light landing-btn--mypage"
                 onClick={() => {
                   controller.setRoutePage('dashboard');
                   setDashboardTab('overview');

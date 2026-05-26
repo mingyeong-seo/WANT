@@ -4,7 +4,7 @@ export default function ConsoleLayout({ shellClassName = '', sidebar, topbar, me
       {sidebar}
       <main className="console-main">
         {topbar}
-        {!!message && <div className="alert-info slim">{message}</div>}
+        {/* {!!message && <div className="alert-info slim">{message}</div>} */}
         {children}
       </main>
     </div>
