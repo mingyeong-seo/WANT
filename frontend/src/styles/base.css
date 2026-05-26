@@ -327,11 +327,15 @@ textarea {
   border-color: #9cc3bc;
 }
 
+.bookmark-status-filter--mobile {
+  display: none;
+}
+
 /* 추가 */
 .bookmark-table-wrap {
   margin-top: 16px;
   max-height: 400px;
-  overflow-y: auto;
+  overflow: auto;
 }
 
 /* 추가 */
@@ -346,6 +350,108 @@ textarea {
 .bookmark-table-wrap .board-table td {
   text-align: center;
   vertical-align: middle;
+}
+
+.bookmark-scroll-hint {
+  display: none;
+}
+
+.bookmark-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px 16px;
+}
+
+.bookmark-pagination button {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bookmark-pagination button.active {
+  border-color: #115e50;
+  background: #115e50;
+  color: #fff;
+}
+
+.bookmark-pagination button:disabled {
+  cursor: default;
+  opacity: 0.42;
+}
+
+@media (max-width: 768px) {
+  .bookmark-status-filter--desktop {
+    display: none;
+  }
+
+  .bookmark-status-filter--mobile {
+    display: flex;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    justify-content: flex-end;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .bookmark-status-filter--mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bookmark-status-filter--mobile button {
+    flex: 0 0 auto;
+    min-width: 52px;
+    height: 40px;
+    padding: 0 14px;
+    margin: 0;
+  }
+
+  .bookmark-table-surface .table-head-row {
+    display: block;
+  }
+
+  .bookmark-table-surface .table-head {
+    padding-bottom: 0;
+  }
+
+  .bookmark-scroll-hint {
+    display: block;
+    padding: 0 12px 14px;
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .bookmark-pagination {
+    padding-top: 12px;
+    gap: 6px;
+  }
+
+  .bookmark-pagination button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 9px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 768px) {
+  .bookmark-scroll-hint {
+    display: none;
+  }
 }
 
 /* 추가 */

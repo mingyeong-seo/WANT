@@ -132,13 +132,13 @@
 }
 
 .bookmark-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   border: 1px solid #d7deea;
   background: #ffffff;
   color: #98a2b3;
-  font-size: 20px;
+  font-size: 25px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -248,6 +248,10 @@
   width: 100%;
 }
 
+.quote-detail-map-card .quote-detail-card__title-row {
+  padding-bottom: 16px;
+}
+
 .quote-detail-map-card__body {
   display: block;
 }
@@ -256,7 +260,20 @@
   position: relative;
   height: 440px;
   background: #eef2f7;
-  border-top: 1px solid #dbe4f0;
+  border-top: 0;
+  overflow: hidden;
+}
+
+.quote-detail-map-real::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.06), transparent);
 }
 
 .quote-detail-kakao-map {
@@ -304,9 +321,13 @@
 .quote-detail-map-real__meta-card {
   min-width: 140px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.42);
   padding: 14px 16px;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 14px 30px rgba(15, 23, 42, 0.1);
+  backdrop-filter: blur(14px) saturate(150%);
 }
 
 .quote-detail-map-real__meta-card span {
@@ -809,9 +830,37 @@
     align-items: stretch;
   }
 
+  .quote-detail-header {
+    position: relative;
+    padding-right: 56px;
+  }
+
   .quote-detail-header__actions {
-    justify-content: flex-start;
+    position: absolute;
+    top: 46px;
+    right: 0;
+    justify-content: flex-end;
     gap: 8px;
+  }
+
+  .quote-detail-header__actions .bookmark-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    font-size: 22px;
+  }
+
+  .quote-detail-header__actions .quote-detail-bid-btn {
+    display: none;
+  }
+
+  @media (min-width: 481px) {
+    .quote-detail-header__actions .bookmark-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      font-size: 25px;
+    }
   }
 
   .quote-detail-header__hero-badge-wrap {
