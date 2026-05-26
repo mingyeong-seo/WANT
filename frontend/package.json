@@ -9,7 +9,6 @@
     "preview": "node node_modules/vite/bin/vite.js preview"
   },
   "dependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.60.1",
     "@stomp/stompjs": "^7.2.0",
     "axios": "^1.7.7",
     "html2canvas": "^1.4.1",
