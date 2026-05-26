@@ -26,6 +26,14 @@
     grid-template-columns: 1fr;
   }
 
+  .console-main {
+    min-width: 0;
+  }
+
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+
   .console-sidebar {
     border-right: 0;
     border-bottom: 1px solid rgba(255, 255, 255, .08);
@@ -261,4 +269,206 @@ label {
 
 .image-nav.right {
   right: -50px;
+}
+
+/* =========================
+   Tablet
+========================= */
+@media (max-width: 1024px) {
+
+  /* 사이드바 */
+  .console-sidebar {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .sidebar-profile {
+    cursor: pointer;
+    user-select: none;
+    transition: 0.2s ease;
+  }
+
+  .sidebar-profile:active {
+    transform: scale(0.98);
+  }
+
+  .sidebar-toggle {
+    font-size: 11px;
+    opacity: 0.7;
+  }
+
+  .sidebar-nav {
+    animation: sidebarFade 0.25s ease;
+  }
+
+  .side-mini-kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sidebar-divider {
+    display: block;
+    grid-column: 1 / -1;
+    height: 1px;
+    margin: 4px 0 2px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+  }
+
+  /* 배차 목록 */
+  .shipment-board-page .board-table {
+    min-width: 900px;
+  }
+}
+
+/* =========================
+   Mobile
+========================= */
+@media (max-width: 768px) {
+
+  /* 사이드바 */
+  .console-main {
+    padding: 16px;
+  }
+
+  .console-sidebar {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .console-logo {
+    display: none;
+  }
+
+  .sidebar-profile {
+    text-align: center;
+    padding: 14px;
+  }
+
+  .sidebar-profile strong {
+    font-size: 16px;
+  }
+
+  .sidebar-profile small {
+    display: none;
+  }
+
+  .sidebar-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .nav-link,
+  .btn.block {
+    height: 42px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .sidebar-divider {
+    display: none;
+  }
+
+  .side-mini-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-divider {
+    display: block;
+    grid-column: 1 / -1;
+    height: 1px;
+    margin: 4px 0 2px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+  }
+
+  /* 배차 목록 */
+  .shipment-board-page .table-head-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+}
+
+/* =========================
+   Small Mobile
+========================= */
+@media (max-width: 480px) {
+
+  /* 사이드바 */
+  .console-main {
+    padding: 14px;
+  }
+
+  .console-sidebar {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .sidebar-profile {
+    padding: 12px;
+    margin-bottom: 3px;
+  }
+
+  .sidebar-profile strong {
+    font-size: 15px;
+  }
+
+  .sidebar-profile small,
+  .sidebar-profile span {
+    display: none;
+  }
+
+  .sidebar-nav {
+    gap: 6px;
+  }
+
+  .nav-link,
+  .btn.block {
+    height: 38px;
+    padding: 0 10px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .side-mini-kpis {
+    display: none;
+  }
+
+  .sidebar-divider {
+    display: block;
+    grid-column: 1 / -1;
+    height: 1px;
+    margin: 4px 0 2px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+  }
+
+  /* 배차 목록 */
+  .shipment-board-page .table-scroll::after {
+    content: "↔ 좌우로 스크롤";
+    display: block;
+    font-size: 11px;
+    text-align: center;
+    color: var(--text-soft);
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+
+/* =========================
+   Sidebar Animation
+========================= */
+
+@keyframes sidebarFade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

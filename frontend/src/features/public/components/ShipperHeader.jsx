@@ -45,7 +45,7 @@ export default function ShipperHeader({ controller }) {
             className={navButtonClass(currentRoute === "quotes" || currentRoute === "detail")}
             onClick={() => controller.setRoutePage("quotes")}
           >
-            견적 목록 보기
+            견적 목록
           </button>
 
           <button
@@ -77,13 +77,13 @@ export default function ShipperHeader({ controller }) {
             className={navButtonClass(currentRoute === "game")}
             onClick={() => controller.setRoutePage("game")}
           >
-            미니게임
+            미니 게임
           </button>
         </nav>
 
         <div className="landing-header__actions">
           <button
-            className="landing-btn landing-btn--light"
+            className="landing-btn landing-btn--light landing-btn--mypage"
             onClick={() => {
               controller.setRoutePage("dashboard");
               controller.setDashboardTab("overview");

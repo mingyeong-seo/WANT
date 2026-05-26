@@ -108,7 +108,7 @@ export default function UserBoardTab({ controller }) {
   const [previewIndex, setPreviewIndex] = useState(0);
 
   return (
-    <div className="page-stack">
+    <div className="page-stack shipment-board-page">
       <div className="surface table-surface shipment-table">
         <div className="table-head">
           <div className="table-head-row">
@@ -340,7 +340,7 @@ export default function UserBoardTab({ controller }) {
                   <strong>
                     {formatMinutesToHour(
                       selected.tracking?.remainingMinutes ??
-                        selected.estimatedMinutes,
+                      selected.estimatedMinutes,
                     )}
                   </strong>
                 </div>
@@ -397,35 +397,35 @@ export default function UserBoardTab({ controller }) {
                   profile={
                     auth.role === "DRIVER"
                       ? {
-                          id: selected.shipperId,
-                          name: selected.shipperName,
-                          role: "SHIPPER",
-                          companyName: selected.companyName,
-                          bio: selected.shipperBio,
-                          profileImageUrl: selected.shipperProfileImageUrl,
-                          contactEmail: selected.shipperContactEmail,
-                          contactPhone: selected.shipperContactPhone,
-                          averageRating: selected.shipperAverageRating,
-                          ratingCount: selected.shipperRatingCount,
-                          completedCount: undefined,
-                          highCancelBadge: selected.counterpartyHighCancelBadge,
-                        }
+                        id: selected.shipperId,
+                        name: selected.shipperName,
+                        role: "SHIPPER",
+                        companyName: selected.companyName,
+                        bio: selected.shipperBio,
+                        profileImageUrl: selected.shipperProfileImageUrl,
+                        contactEmail: selected.shipperContactEmail,
+                        contactPhone: selected.shipperContactPhone,
+                        averageRating: selected.shipperAverageRating,
+                        ratingCount: selected.shipperRatingCount,
+                        completedCount: undefined,
+                        highCancelBadge: selected.counterpartyHighCancelBadge,
+                      }
                       : selected.assignedDriverName
                         ? {
-                            id: selected.assignedDriverId,
-                            name: selected.assignedDriverName,
-                            role: "DRIVER",
-                            bio: selected.assignedDriverBio,
-                            profileImageUrl:
-                              selected.assignedDriverProfileImageUrl,
-                            contactEmail: selected.assignedDriverContactEmail,
-                            contactPhone: selected.assignedDriverContactPhone,
-                            averageRating: selected.assignedDriverAverageRating,
-                            ratingCount: selected.assignedDriverRatingCount,
-                            completedCount: undefined,
-                            highCancelBadge:
-                              selected.counterpartyHighCancelBadge,
-                          }
+                          id: selected.assignedDriverId,
+                          name: selected.assignedDriverName,
+                          role: "DRIVER",
+                          bio: selected.assignedDriverBio,
+                          profileImageUrl:
+                            selected.assignedDriverProfileImageUrl,
+                          contactEmail: selected.assignedDriverContactEmail,
+                          contactPhone: selected.assignedDriverContactPhone,
+                          averageRating: selected.assignedDriverAverageRating,
+                          ratingCount: selected.assignedDriverRatingCount,
+                          completedCount: undefined,
+                          highCancelBadge:
+                            selected.counterpartyHighCancelBadge,
+                        }
                         : null
                   }
                   onImageClick={(imageUrl) => {
