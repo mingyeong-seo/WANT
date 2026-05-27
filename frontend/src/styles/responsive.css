@@ -316,7 +316,52 @@ label {
 
   /* 배차 목록 */
   .shipment-board-page .board-table {
-    min-width: 900px;
+    min-width: 1200px;
+  }
+
+  .shipment-board-page .table-head-row {
+    display: flex;
+    align-items: center;
+  }
+
+  .board-filter {
+    margin-left: auto;
+    width: auto;
+    justify-content: flex-end;
+  }
+
+  .shipment-board-page .table-scroll::after {
+    content: "↔ 좌우로 스크롤";
+    display: block;
+    font-size: 12px;
+    text-align: center;
+    color: var(--text-soft);
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  /* 정산 내역 */
+  .console-shell {
+    align-items: start;
+    grid-auto-rows: min-content;
+  }
+
+  .console-sidebar {
+    height: fit-content;
+  }
+
+  .console-main {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .board-filter {
+    width: auto !important;
+    margin-left: auto !important;
+    justify-content: flex-end !important;
   }
 }
 
@@ -384,11 +429,40 @@ label {
 
   /* 배차 목록 */
   .shipment-board-page .table-head-row {
-    flex-direction: column;
+    display: flex;
+    flex-wrap: wrap;
     align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
   }
 
+  .board-filter {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  /* 즐겨찾기 & 상태 버튼 */
+  .detail-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .detail-head>div:first-child {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .table-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
 }
 
 /* =========================
@@ -449,11 +523,24 @@ label {
   .shipment-board-page .table-scroll::after {
     content: "↔ 좌우로 스크롤";
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     text-align: center;
     color: var(--text-soft);
     padding-top: 10px;
     padding-bottom: 10px;
+  }
+
+  .shipment-board-page .table-head-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .board-filter {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-left: 0;
   }
 }
 
