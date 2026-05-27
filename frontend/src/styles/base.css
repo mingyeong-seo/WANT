@@ -251,6 +251,14 @@ textarea {
   text-align: center;
 }
 
+
+
+.shipment-table .table-head-row {
+  position: relative;
+}
+
+
+
 /* 추가 */
 .table-surface>.section-title-row:first-child {
   margin-top: 16px;
