@@ -438,7 +438,7 @@ label {
   .board-filter {
     width: 100%;
     display: flex;
-    justify-content: center;
+    /* justify-content: center; */
     margin-left: 0;
   }
 
@@ -543,7 +543,7 @@ label {
   .board-filter {
     width: 100%;
     display: flex;
-    justify-content: center;
+    /* justify-content: center; */
     margin-left: 0;
   }
 
