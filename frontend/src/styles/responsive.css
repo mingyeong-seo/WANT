@@ -443,6 +443,10 @@ label {
   }
 
   /* 즐겨찾기 & 상태 버튼 */
+  .bookmark-status-filter--external {
+    justify-content: flex-end;
+  }
+
   .detail-head {
     display: flex;
     justify-content: space-between;
@@ -541,6 +545,10 @@ label {
     display: flex;
     justify-content: center;
     margin-left: 0;
+  }
+
+  .bookmark-status-filter--external {
+    justify-content: flex-end;
   }
 }
 

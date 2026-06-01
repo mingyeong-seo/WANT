@@ -339,11 +339,28 @@ textarea {
   display: none;
 }
 
+.bookmark-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bookmark-status-filter--external {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin: 0 0 12px;
+}
+
 /* 추가 */
 .bookmark-table-wrap {
-  margin-top: 16px;
+  margin-top: 0;
   max-height: 400px;
   overflow: auto;
+}
+
+.bookmark-table-wrap .board-table {
+  margin-top: 0;
 }
 
 /* 추가 */
