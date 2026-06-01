@@ -108,53 +108,50 @@ export default function UserBoardTab({ controller }) {
   const [previewIndex, setPreviewIndex] = useState(0);
 
   return (
-    <div className="page-stack">
-      <div className="surface table-surface shipment-table">
-        <div className="table-head">
-          <div className="table-head-row">
-            <SectionTitle title="배차 목록" />
+    <div className="page-stack shipment-board-page">
 
-            {/* 추가 */}
-            <div
-              className={`board-filter ${auth.role === "SHIPPER" ? "shipper" : "driver"}`}
-            >
-              <button
-                className={statusFilter === "ALL" ? "active" : ""}
-                onClick={() => setStatusFilter("ALL")}
-              >
-                전체
-              </button>
+      <div className="board-filter-wrap shipment-filter-wrap">
+        <div
+          className={`board-filter ${auth.role === "SHIPPER" ? "shipper" : "driver"}`}
+        >
+          <button
+            className={statusFilter === "ALL" ? "active" : ""}
+            onClick={() => setStatusFilter("ALL")}
+          >
+            전체
+          </button>
 
-              <button
-                className={statusFilter === "BIDDING" ? "active" : ""}
-                onClick={() => setStatusFilter("BIDDING")}
-              >
-                입찰중
-              </button>
+          <button
+            className={statusFilter === "BIDDING" ? "active" : ""}
+            onClick={() => setStatusFilter("BIDDING")}
+          >
+            입찰중
+          </button>
 
-              <button
-                className={statusFilter === "IN_TRANSIT" ? "active" : ""}
-                onClick={() => setStatusFilter("IN_TRANSIT")}
-              >
-                운송중
-              </button>
+          <button
+            className={statusFilter === "IN_TRANSIT" ? "active" : ""}
+            onClick={() => setStatusFilter("IN_TRANSIT")}
+          >
+            운송중
+          </button>
 
-              <button
-                className={statusFilter === "CONFIRMED" ? "active" : ""}
-                onClick={() => setStatusFilter("CONFIRMED")}
-              >
-                확정
-              </button>
+          <button
+            className={statusFilter === "CONFIRMED" ? "active" : ""}
+            onClick={() => setStatusFilter("CONFIRMED")}
+          >
+            확정
+          </button>
 
-              <button
-                className={statusFilter === "CANCELLED" ? "active" : ""}
-                onClick={() => setStatusFilter("CANCELLED")}
-              >
-                취소
-              </button>
-            </div>
-          </div>
+          <button
+            className={statusFilter === "CANCELLED" ? "active" : ""}
+            onClick={() => setStatusFilter("CANCELLED")}
+          >
+            취소
+          </button>
         </div>
+      </div>
+
+      <div className="surface table-surface shipment-table">
         <div className="table-scroll">
           <table className="board-table">
             <thead>
@@ -340,7 +337,7 @@ export default function UserBoardTab({ controller }) {
                   <strong>
                     {formatMinutesToHour(
                       selected.tracking?.remainingMinutes ??
-                        selected.estimatedMinutes,
+                      selected.estimatedMinutes,
                     )}
                   </strong>
                 </div>
@@ -397,35 +394,35 @@ export default function UserBoardTab({ controller }) {
                   profile={
                     auth.role === "DRIVER"
                       ? {
-                          id: selected.shipperId,
-                          name: selected.shipperName,
-                          role: "SHIPPER",
-                          companyName: selected.companyName,
-                          bio: selected.shipperBio,
-                          profileImageUrl: selected.shipperProfileImageUrl,
-                          contactEmail: selected.shipperContactEmail,
-                          contactPhone: selected.shipperContactPhone,
-                          averageRating: selected.shipperAverageRating,
-                          ratingCount: selected.shipperRatingCount,
-                          completedCount: undefined,
-                          highCancelBadge: selected.counterpartyHighCancelBadge,
-                        }
+                        id: selected.shipperId,
+                        name: selected.shipperName,
+                        role: "SHIPPER",
+                        companyName: selected.companyName,
+                        bio: selected.shipperBio,
+                        profileImageUrl: selected.shipperProfileImageUrl,
+                        contactEmail: selected.shipperContactEmail,
+                        contactPhone: selected.shipperContactPhone,
+                        averageRating: selected.shipperAverageRating,
+                        ratingCount: selected.shipperRatingCount,
+                        completedCount: undefined,
+                        highCancelBadge: selected.counterpartyHighCancelBadge,
+                      }
                       : selected.assignedDriverName
                         ? {
-                            id: selected.assignedDriverId,
-                            name: selected.assignedDriverName,
-                            role: "DRIVER",
-                            bio: selected.assignedDriverBio,
-                            profileImageUrl:
-                              selected.assignedDriverProfileImageUrl,
-                            contactEmail: selected.assignedDriverContactEmail,
-                            contactPhone: selected.assignedDriverContactPhone,
-                            averageRating: selected.assignedDriverAverageRating,
-                            ratingCount: selected.assignedDriverRatingCount,
-                            completedCount: undefined,
-                            highCancelBadge:
-                              selected.counterpartyHighCancelBadge,
-                          }
+                          id: selected.assignedDriverId,
+                          name: selected.assignedDriverName,
+                          role: "DRIVER",
+                          bio: selected.assignedDriverBio,
+                          profileImageUrl:
+                            selected.assignedDriverProfileImageUrl,
+                          contactEmail: selected.assignedDriverContactEmail,
+                          contactPhone: selected.assignedDriverContactPhone,
+                          averageRating: selected.assignedDriverAverageRating,
+                          ratingCount: selected.assignedDriverRatingCount,
+                          completedCount: undefined,
+                          highCancelBadge:
+                            selected.counterpartyHighCancelBadge,
+                        }
                         : null
                   }
                   onImageClick={(imageUrl) => {
@@ -705,58 +702,60 @@ export default function UserBoardTab({ controller }) {
       />
 
       {/* 추가 */}
-      {previewImages.length > 0 && (
-        <div className="image-modal" onClick={() => setPreviewImages([])}>
-          <div
-            className="image-modal-inner"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* 왼쪽 버튼 */}
-            {previewImages.length > 1 && (
-              <button
-                className="image-nav left"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPreviewIndex((prev) =>
-                    prev === 0 ? previewImages.length - 1 : prev - 1,
-                  );
-                }}
-              >
-                ‹
-              </button>
-            )}
-
-            {/* 이미지 */}
-            <img
-              src={previewImages[previewIndex]}
-              alt="preview"
-              className="image-modal-content"
+      {
+        previewImages.length > 0 && (
+          <div className="image-modal" onClick={() => setPreviewImages([])}>
+            <div
+              className="image-modal-inner"
               onClick={(e) => e.stopPropagation()}
-            />
+            >
+              {/* 왼쪽 버튼 */}
+              {previewImages.length > 1 && (
+                <button
+                  className="image-nav left"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewIndex((prev) =>
+                      prev === 0 ? previewImages.length - 1 : prev - 1,
+                    );
+                  }}
+                >
+                  ‹
+                </button>
+              )}
 
-            {/* 오른쪽 버튼 */}
-            {previewImages.length > 1 && (
-              <button
-                className="image-nav right"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPreviewIndex((prev) =>
-                    prev === previewImages.length - 1 ? 0 : prev + 1,
-                  );
-                }}
-              >
-                ›
-              </button>
-            )}
+              {/* 이미지 */}
+              <img
+                src={previewImages[previewIndex]}
+                alt="preview"
+                className="image-modal-content"
+                onClick={(e) => e.stopPropagation()}
+              />
+
+              {/* 오른쪽 버튼 */}
+              {previewImages.length > 1 && (
+                <button
+                  className="image-nav right"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewIndex((prev) =>
+                      prev === previewImages.length - 1 ? 0 : prev + 1,
+                    );
+                  }}
+                >
+                  ›
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <PenaltyBlockedModal
         open={penaltyBlockedModal.open}
         message={penaltyBlockedModal.message}
         onClose={closePenaltyBlockedModal}
       />
-    </div>
+    </div >
   );
 }

@@ -132,7 +132,7 @@ export default function CargoAssistPanel({
 
   if (panelMode === "vehicle") {
     return (
-      <div className="quote-assist-panel">
+      <div className="quote-assist-panel quote-assist-panel--vehicle">
         <div className="quote-assist-panel__header">
           <h3 className="quote-assist-panel__title">희망 차량 선택</h3>
           <button
@@ -163,7 +163,11 @@ export default function CargoAssistPanel({
           </button>
         </div>
 
-        <div className="vehicle-select-list">
+        <div
+          className={`vehicle-select-list ${
+            isLargeTab ? "vehicle-select-list--large" : ""
+          }`.trim()}
+        >
           {!isLargeTab &&
             SMALL_VEHICLES.map((vehicle) => (
               <VehicleItem
@@ -209,7 +213,7 @@ export default function CargoAssistPanel({
 
   if (panelMode === "cargoType") {
     return (
-      <div className="quote-assist-panel">
+      <div className="quote-assist-panel quote-assist-panel--cargo-type">
         <div className="quote-assist-panel__header">
           <h3 className="quote-assist-panel__title">화물 종류 선택</h3>
           <button

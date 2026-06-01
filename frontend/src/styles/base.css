@@ -1,7 +1,9 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
 :root {
-  --font-ui: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+  --font-ui:
+    "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR",
+    sans-serif;
   --bg: #f4f6f8;
   --surface: #ffffff;
   --surface-2: #f8fafc;
@@ -95,7 +97,9 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition: background .2s ease, color .2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 button,
@@ -140,13 +144,15 @@ textarea {
   border-radius: var(--radius-sm);
   padding: 12px 14px;
   outline: none;
-  transition: border-color .15s ease, box-shadow .15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: rgba(var(--accent-rgb), .45);
+  border-color: rgba(var(--accent-rgb), 0.45);
   box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
 }
 
@@ -251,8 +257,12 @@ textarea {
   text-align: center;
 }
 
+.shipment-table .table-head-row {
+  position: relative;
+}
+
 /* 추가 */
-.table-surface>.section-title-row:first-child {
+.table-surface > .section-title-row:first-child {
   margin-top: 16px;
   margin-left: 16px;
 }
@@ -327,11 +337,32 @@ textarea {
   border-color: #9cc3bc;
 }
 
+.bookmark-status-filter--mobile {
+  display: none;
+}
+
+.bookmark-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bookmark-status-filter--external {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin: 0 0 12px;
+}
+
 /* 추가 */
 .bookmark-table-wrap {
-  margin-top: 16px;
+  margin-top: 0;
   max-height: 400px;
-  overflow-y: auto;
+  overflow: auto;
+}
+
+.bookmark-table-wrap .board-table {
+  margin-top: 0;
 }
 
 /* 추가 */
@@ -348,6 +379,108 @@ textarea {
   vertical-align: middle;
 }
 
+.bookmark-scroll-hint {
+  display: none;
+}
+
+.bookmark-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px 16px;
+}
+
+.bookmark-pagination button {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bookmark-pagination button.active {
+  border-color: #115e50;
+  background: #115e50;
+  color: #fff;
+}
+
+.bookmark-pagination button:disabled {
+  cursor: default;
+  opacity: 0.42;
+}
+
+@media (max-width: 768px) {
+  .bookmark-status-filter--desktop {
+    display: none;
+  }
+
+  .bookmark-status-filter--mobile {
+    display: flex;
+    width: 100%;
+    margin: 0 0 12px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    justify-content: flex-end;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .bookmark-status-filter--mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .bookmark-status-filter--mobile button {
+    flex: 0 0 auto;
+    min-width: 52px;
+    height: 40px;
+    padding: 0 14px;
+    margin: 0;
+  }
+
+  .bookmark-table-surface .table-head-row {
+    display: block;
+  }
+
+  .bookmark-table-surface .table-head {
+    padding-bottom: 0;
+  }
+
+  .bookmark-scroll-hint {
+    display: block;
+    padding: 0 12px 14px;
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .bookmark-pagination {
+    padding-top: 12px;
+    gap: 6px;
+  }
+
+  .bookmark-pagination button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 9px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 768px) {
+  .bookmark-scroll-hint {
+    display: none;
+  }
+}
+
 /* 추가 */
 .ratings-pending .split-2 {
   display: flex;
@@ -355,7 +488,7 @@ textarea {
 }
 
 /* 추가 */
-.ratings-pending .split-2>div {
+.ratings-pending .split-2 > div {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -383,14 +516,19 @@ textarea {
 }
 
 .hero-panel-dark {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-dark) 94%, #000 6%) 0%, var(--primary-dark) 60%, color-mix(in srgb, var(--primary) 52%, var(--primary-dark) 48%) 100%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-dark) 94%, #000 6%) 0%,
+    var(--primary-dark) 60%,
+    color-mix(in srgb, var(--primary) 52%, var(--primary-dark) 48%) 100%
+  );
   color: #fff;
   border-color: color-mix(in srgb, var(--primary-dark) 80%, #fff 20%);
 }
 
 .hero-panel-dark p,
 .hero-panel-dark .eyebrow {
-  color: rgba(255, 255, 255, .74);
+  color: rgba(255, 255, 255, 0.74);
 }
 
 .hero-panel-dark h1 {
@@ -431,12 +569,16 @@ textarea {
   width: 42px;
   height: 42px;
   border-radius: 8px;
-  background: linear-gradient(180deg, var(--primary-dark) 0%, color-mix(in srgb, var(--primary) 40%, var(--primary-dark) 60%) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--primary-dark) 0%,
+    color-mix(in srgb, var(--primary) 40%, var(--primary-dark) 60%) 100%
+  );
   color: #fff;
   display: grid;
   place-items: center;
   font-weight: 800;
-  letter-spacing: .08em;
+  letter-spacing: 0.08em;
 }
 
 .identity-title {
@@ -452,4 +594,21 @@ textarea {
   color: var(--text-soft);
   font-size: 12px;
   font-weight: 400;
+}
+
+.board-filter-wrap {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.shipment-filter-wrap {
+  margin-bottom: -5px;
+}
+
+.shipment-board-page .shipment-filter-wrap {
+  margin-top: -8px;
+}
+
+.shipment-table .board-table {
+  margin-top: 0 !important;
 }

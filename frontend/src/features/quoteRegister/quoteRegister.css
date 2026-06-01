@@ -799,7 +799,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: 720px;
+  max-height: 840px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -1737,5 +1737,47 @@
 @media (max-width: 640px) {
   .quote-review-image-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .quote-assist-panel--vehicle .vehicle-select-list--large,
+  .quote-assist-panel--cargo-type .vehicle-select-list {
+    max-height: 260px;
+  }
+}
+
+@media (max-width: 375px) {
+  .quote-assist-panel--vehicle .vehicle-select-list,
+  .quote-assist-panel--cargo-type .vehicle-select-list {
+    max-height: 520px;
+  }
+
+  .quote-assist-panel--cargo-type .vehicle-select-list {
+    max-height: 260px;
+  }
+
+  .quote-assist-panel--vehicle .vehicle-select-list--large {
+    max-height: 260px;
+  }
+
+  .quote-register-actions {
+    gap: 8px;
+  }
+
+  .quote-register-actions-left,
+  .quote-register-actions-right {
+    flex: 1;
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .quote-register-actions .primary-button,
+  .quote-register-actions .secondary-button {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    padding: 0 12px;
+    font-size: 14px;
   }
 }
