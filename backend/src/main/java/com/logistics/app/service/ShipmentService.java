@@ -60,6 +60,8 @@ public class ShipmentService {
     }
 
     public ShipmentDtos.ShipmentResponse createShipment(User shipper, ShipmentDtos.CreateShipmentRequest request) {
+        validateTradeAvailability(shipper);
+
         if (request.getScheduledStartAt() == null) {
             throw new RuntimeException("운송 시작 예정 시각을 입력해 주세요.");
         }
@@ -67,8 +69,19 @@ public class ShipmentService {
             throw new RuntimeException("운송 시작 예정 시각은 현재보다 최소 10분 이후여야 합니다.");
         }
 
-        int estimatedMinutes = estimateMinutes(request.getOriginLat(), request.getOriginLng(), request.getDestinationLat(), request.getDestinationLng());
-        double estimatedDistanceKm = estimateDistanceKm(request.getOriginLat(), request.getOriginLng(), request.getDestinationLat(), request.getDestinationLng());
+        int estimatedMinutes = estimateMinutes(
+                request.getOriginLat(),
+                request.getOriginLng(),
+                request.getDestinationLat(),
+                request.getDestinationLng()
+        );
+
+        double estimatedDistanceKm = estimateDistanceKm(
+                request.getOriginLat(),
+                request.getOriginLng(),
+                request.getDestinationLat(),
+                request.getDestinationLng()
+        );
 
         Shipment shipment = Shipment.builder()
                 .shipper(shipper)
@@ -97,20 +110,27 @@ public class ShipmentService {
                 .estimatedDistanceKm(estimatedDistanceKm)
                 .status(ShipmentStatus.BIDDING)
                 .build();
+
         shipmentRepository.save(shipment);
         saveCargoImages(shipment, request.getCargoImageDataUrls(), request.getCargoImageNames());
         logStatus(shipment, ShipmentStatus.REQUESTED, ShipmentStatus.BIDDING, shipper.getEmail(), "화물 등록");
+
         ShipmentDtos.ShipmentResponse response = toResponse(shipment, shipper);
         realtimePublisher.publishShipmentUpdated(response);
         return response;
     }
 
     public ShipmentDtos.ShipmentResponse updateShipment(Long shipmentId, User shipper, ShipmentDtos.UpdateShipmentRequest request) {
+        validateTradeAvailability(shipper);
+
         Shipment shipment = getById(shipmentId);
+
         if (shipment.getShipper() == null || !shipment.getShipper().getId().equals(shipper.getId())) {
             throw new RuntimeException("본인 견적만 수정할 수 있습니다.");
         }
-        if (shipment.getStatus() == ShipmentStatus.IN_TRANSIT || shipment.getStatus() == ShipmentStatus.COMPLETED || shipment.getStatus() == ShipmentStatus.CANCELLED) {
+        if (shipment.getStatus() == ShipmentStatus.IN_TRANSIT
+                || shipment.getStatus() == ShipmentStatus.COMPLETED
+                || shipment.getStatus() == ShipmentStatus.CANCELLED) {
             throw new RuntimeException("현재 상태에서는 수정할 수 없습니다.");
         }
         if (request.getScheduledStartAt() == null) {
@@ -120,8 +140,19 @@ public class ShipmentService {
             throw new RuntimeException("운송 시작 예정 시각은 현재보다 최소 10분 이후여야 합니다.");
         }
 
-        int estimatedMinutes = estimateMinutes(request.getOriginLat(), request.getOriginLng(), request.getDestinationLat(), request.getDestinationLng());
-        double estimatedDistanceKm = estimateDistanceKm(request.getOriginLat(), request.getOriginLng(), request.getDestinationLat(), request.getDestinationLng());
+        int estimatedMinutes = estimateMinutes(
+                request.getOriginLat(),
+                request.getOriginLng(),
+                request.getDestinationLat(),
+                request.getDestinationLng()
+        );
+
+        double estimatedDistanceKm = estimateDistanceKm(
+                request.getOriginLat(),
+                request.getOriginLng(),
+                request.getDestinationLat(),
+                request.getDestinationLng()
+        );
 
         shipment.setTitle(request.getTitle());
         shipment.setCargoType(request.getCargoType());
@@ -146,11 +177,14 @@ public class ShipmentService {
         shipment.setScheduledStartAt(request.getScheduledStartAt());
         shipment.setEstimatedMinutes(estimatedMinutes);
         shipment.setEstimatedDistanceKm(estimatedDistanceKm);
+
         shipmentRepository.save(shipment);
 
         shipmentImageRepository.deleteByShipmentAndType(shipment, ShipmentImageType.CARGO);
         saveCargoImages(shipment, request.getCargoImageDataUrls(), request.getCargoImageNames());
+
         logStatus(shipment, shipment.getStatus(), shipment.getStatus(), shipper.getEmail(), "견적 수정");
+
         ShipmentDtos.ShipmentResponse response = toResponse(shipment, shipper);
         realtimePublisher.publishShipmentUpdated(response);
         return response;
@@ -158,7 +192,10 @@ public class ShipmentService {
 
     public List<ShipmentDtos.ShipmentResponse> listForUser(User user) {
         return shipmentRepository.findAll().stream()
-                .sorted(Comparator.comparing(Shipment::getUpdatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .sorted(Comparator.comparing(
+                        Shipment::getUpdatedAt,
+                        Comparator.nullsLast(Comparator.naturalOrder())
+                ).reversed())
                 .map(shipment -> toResponse(shipment, user))
                 .collect(Collectors.toList());
     }
@@ -178,7 +215,9 @@ public class ShipmentService {
 
     public ShipmentDtos.OfferResponse createOffer(Long shipmentId, User driver, ShipmentDtos.CreateOfferRequest request) {
         validateTradeAvailability(driver);
+
         Shipment shipment = getById(shipmentId);
+
         if (shipment.getStatus() != ShipmentStatus.BIDDING) {
             throw new RuntimeException("입찰 가능한 상태가 아닙니다.");
         }
@@ -192,17 +231,33 @@ public class ShipmentService {
                 .price(request.getPrice())
                 .message(request.getMessage())
                 .build();
+
         offerRepository.save(offer);
-        notificationService.notifyUser(shipment.getShipper().getId(), "OFFER", "새 제안이 도착했습니다.",
-                driver.getName() + "님이 " + shipment.getTitle() + " 화물에 " + String.format("%,d원", offer.getPrice()) + " 제안을 보냈습니다.", "SHIPMENT", shipment.getId());
+
+        notificationService.notifyUser(
+                shipment.getShipper().getId(),
+                "OFFER",
+                "새 제안이 도착했습니다.",
+                driver.getName() + "님이 " + shipment.getTitle() + " 화물에 "
+                        + String.format("%,d원", offer.getPrice()) + " 제안을 보냈습니다.",
+                "SHIPMENT",
+                shipment.getId()
+        );
+
         realtimePublisher.publishShipmentUpdated(toResponse(shipment, driver));
         return toOfferResponse(offer);
     }
 
     public ShipmentDtos.ShipmentResponse acceptOffer(Long offerId, User shipper) {
         validateTradeAvailability(shipper);
-        Offer offer = offerRepository.findById(offerId).orElseThrow(() -> new RuntimeException("입찰 제안을 찾을 수 없습니다."));
+
+        Offer offer = offerRepository.findById(offerId)
+                .orElseThrow(() -> new RuntimeException("입찰 제안을 찾을 수 없습니다."));
+
+        validateTradeAvailability(offer.getDriver());
+
         Shipment shipment = offer.getShipment();
+
         if (!shipment.getShipper().getId().equals(shipper.getId())) {
             throw new RuntimeException("본인 화물만 차주를 확정할 수 있습니다.");
         }
@@ -216,39 +271,61 @@ public class ShipmentService {
         });
 
         ShipmentStatus before = shipment.getStatus();
+
         shipment.setAssignedDriver(offer.getDriver());
         shipment.setAcceptedOfferId(offerId);
         shipment.setStatus(ShipmentStatus.CONFIRMED);
         shipment.setAgreedPrice(offer.getPrice());
+
         shipmentRepository.save(shipment);
 
-        notificationService.notifyUser(offer.getDriver().getId(), "OFFER_ACCEPTED", "제안이 수락되었습니다.",
-                shipment.getTitle() + " 의 배정이 확정되었습니다. 배차 보드에서 운송을 시작해 주세요.", "SHIPMENT", shipment.getId());
+        notificationService.notifyUser(
+                offer.getDriver().getId(),
+                "OFFER_ACCEPTED",
+                "제안이 수락되었습니다.",
+                shipment.getTitle() + " 의 배정이 확정되었습니다. 배차 보드에서 운송을 시작해 주세요.",
+                "SHIPMENT",
+                shipment.getId()
+        );
+
         offerRepository.findByShipment(shipment).stream()
                 .filter(item -> !item.getId().equals(offerId))
                 .map(Offer::getDriver)
                 .distinct()
-                .forEach(driverUser -> notificationService.notifyUser(driverUser.getId(), "OFFER_REJECTED", "제안이 선택되지 않았습니다.",
-                        shipment.getTitle() + " 은 다른 차주가 선택되었습니다. 다른 배차를 확인해 보세요.", "SHIPMENT", shipment.getId()));
+                .forEach(driverUser -> notificationService.notifyUser(
+                        driverUser.getId(),
+                        "OFFER_REJECTED",
+                        "제안이 선택되지 않았습니다.",
+                        shipment.getTitle() + " 은 다른 차주가 선택되었습니다. 다른 배차를 확인해 보세요.",
+                        "SHIPMENT",
+                        shipment.getId()
+                ));
 
         logStatus(shipment, before, ShipmentStatus.CONFIRMED, shipper.getEmail(), "차주 확정");
+
         ShipmentDtos.ShipmentResponse response = toResponse(shipment, shipper);
         realtimePublisher.publishShipmentUpdated(response);
         return response;
     }
 
     public ShipmentDtos.ShipmentResponse startTrip(Long shipmentId, User driver) {
+        validateTradeAvailability(driver);
+
         Shipment shipment = getById(shipmentId);
+
         if (shipment.getAssignedDriver() == null || !shipment.getAssignedDriver().getId().equals(driver.getId())) {
             throw new RuntimeException("배정된 차주만 운송을 시작할 수 있습니다.");
         }
         if (!shipment.isPaid()) {
             throw new RuntimeException("결제 완료 후에만 운송을 시작할 수 있습니다.");
         }
+
         ShipmentStatus before = shipment.getStatus();
+
         shipment.setStatus(ShipmentStatus.IN_TRANSIT);
         shipment.setStartedAt(LocalDateTime.now());
         shipment.setEstimatedArrivalAt(LocalDateTime.now().plusMinutes(shipment.getEstimatedMinutes()));
+
         shipmentRepository.save(shipment);
 
         locationLogRepository.save(LocationLog.builder()
@@ -261,6 +338,7 @@ public class ShipmentService {
                 .build());
 
         logStatus(shipment, before, ShipmentStatus.IN_TRANSIT, driver.getEmail(), "운송 시작");
+
         ShipmentDtos.ShipmentResponse response = toResponse(shipment, driver);
         realtimePublisher.publishShipmentUpdated(response);
         return response;
@@ -268,6 +346,7 @@ public class ShipmentService {
 
     public ShipmentDtos.TrackingResponse updateLocation(Long shipmentId, User driver, ShipmentDtos.LocationUpdateRequest request) {
         Shipment shipment = getById(shipmentId);
+
         if (shipment.getAssignedDriver() == null || !shipment.getAssignedDriver().getId().equals(driver.getId())) {
             throw new RuntimeException("배정된 차주만 위치를 업데이트할 수 있습니다.");
         }
@@ -275,7 +354,12 @@ public class ShipmentService {
             throw new RuntimeException("운송중 상태에서만 위치를 업데이트할 수 있습니다.");
         }
 
-        int remainingMinutes = estimateMinutes(request.getLatitude(), request.getLongitude(), shipment.getDestinationLat(), shipment.getDestinationLng());
+        int remainingMinutes = estimateMinutes(
+                request.getLatitude(),
+                request.getLongitude(),
+                shipment.getDestinationLat(),
+                shipment.getDestinationLng()
+        );
 
         LocationLog log = LocationLog.builder()
                 .shipment(shipment)
@@ -285,6 +369,7 @@ public class ShipmentService {
                 .roughLocation(request.getRoughLocation())
                 .remainingMinutes(remainingMinutes)
                 .build();
+
         locationLogRepository.save(log);
 
         ShipmentDtos.TrackingResponse trackingResponse = ShipmentDtos.TrackingResponse.builder()
@@ -302,18 +387,28 @@ public class ShipmentService {
 
     public ShipmentDtos.ShipmentResponse completeTrip(Long shipmentId, User driver, ShipmentDtos.CompleteShipmentRequest request) {
         Shipment shipment = getById(shipmentId);
+        validateTradeAvailability(driver);
         if (shipment.getAssignedDriver() == null || !shipment.getAssignedDriver().getId().equals(driver.getId())) {
             throw new RuntimeException("배정된 차주만 완료할 수 있습니다.");
         }
-        if (request == null || request.getCompletionImageDataUrl() == null || request.getCompletionImageDataUrl().isBlank()) {
+        if (shipment.getStatus() != ShipmentStatus.IN_TRANSIT) {
+            throw new RuntimeException("운송 중 상태에서만 완료할 수 있습니다.");
+        }
+        if (request == null
+                || request.getCompletionImageDataUrl() == null
+                || request.getCompletionImageDataUrl().isBlank()) {
             throw new RuntimeException("배송 완료 사진을 등록해야 완료 처리할 수 있습니다.");
         }
+
         ShipmentStatus before = shipment.getStatus();
+
         shipment.setStatus(ShipmentStatus.COMPLETED);
         shipment.setCompletedAt(LocalDateTime.now());
+
         shipmentRepository.save(shipment);
 
         incrementCompletedCount(shipment.getShipper());
+
         if (shipment.getAssignedDriver() != null) {
             incrementCompletedCount(shipment.getAssignedDriver());
         }
@@ -324,10 +419,20 @@ public class ShipmentService {
                 .originalName(request.getCompletionImageName())
                 .dataUrl(request.getCompletionImageDataUrl())
                 .build());
-        Offer acceptedOffer = shipment.getAcceptedOfferId() != null ? offerRepository.findById(shipment.getAcceptedOfferId()).orElse(null) : null;
-        User adminUser = userRepository.findAll().stream().filter(user -> user.getRole() == UserRole.ADMIN).findFirst().orElse(null);
+
+        Offer acceptedOffer = shipment.getAcceptedOfferId() != null
+                ? offerRepository.findById(shipment.getAcceptedOfferId()).orElse(null)
+                : null;
+
+        User adminUser = userRepository.findAll().stream()
+                .filter(user -> user.getRole() == UserRole.ADMIN)
+                .findFirst()
+                .orElse(null);
+
         financeService.settleCompletedShipment(shipment, acceptedOffer, adminUser);
+
         logStatus(shipment, before, ShipmentStatus.COMPLETED, driver.getEmail(), "운송 완료");
+
         ShipmentDtos.ShipmentResponse response = toResponse(shipment, driver);
         realtimePublisher.publishShipmentUpdated(response);
         return response;
@@ -350,6 +455,7 @@ public class ShipmentService {
         }
 
         ShipmentStatus before = shipment.getStatus();
+
         shipment.setStatus(ShipmentStatus.CANCELLED);
         shipmentRepository.save(shipment);
 
@@ -385,8 +491,13 @@ public class ShipmentService {
                     .build());
         }
 
-        logStatus(shipment, before, ShipmentStatus.CANCELLED, actor.getEmail(),
-                "거래 취소 - " + reasonLabel(request.getReason()) + " / " + request.getDetail().trim());
+        logStatus(
+                shipment,
+                before,
+                ShipmentStatus.CANCELLED,
+                actor.getEmail(),
+                "거래 취소 - " + reasonLabel(request.getReason()) + " / " + request.getDetail().trim()
+        );
 
         ShipmentDtos.ShipmentResponse response = toResponse(shipment, actor);
         realtimePublisher.publishShipmentUpdated(response);
@@ -396,24 +507,40 @@ public class ShipmentService {
     public ShipmentDtos.ToggleBookmarkResponse toggleBookmark(Long shipmentId, User user) {
         Shipment shipment = getById(shipmentId);
         validateReadAccess(shipment, user);
+
         boolean bookmarked;
         var existing = shipmentBookmarkRepository.findByUserAndShipment(user, shipment);
+
         if (existing.isPresent()) {
             shipmentBookmarkRepository.delete(existing.get());
             bookmarked = false;
         } else {
-            shipmentBookmarkRepository.save(ShipmentBookmark.builder().user(user).shipment(shipment).build());
+            shipmentBookmarkRepository.save(ShipmentBookmark.builder()
+                    .user(user)
+                    .shipment(shipment)
+                    .build());
             bookmarked = true;
         }
-        return ShipmentDtos.ToggleBookmarkResponse.builder().bookmarked(bookmarked).build();
+
+        return ShipmentDtos.ToggleBookmarkResponse.builder()
+                .bookmarked(bookmarked)
+                .build();
     }
 
     private void saveCargoImages(Shipment shipment, List<String> dataUrls, List<String> names) {
-        if (dataUrls == null || dataUrls.isEmpty()) return;
+        if (dataUrls == null || dataUrls.isEmpty()) {
+            return;
+        }
+
         for (int i = 0; i < dataUrls.size(); i++) {
             String dataUrl = dataUrls.get(i);
-            if (dataUrl == null || dataUrl.isBlank()) continue;
+
+            if (dataUrl == null || dataUrl.isBlank()) {
+                continue;
+            }
+
             String name = names != null && i < names.size() ? names.get(i) : null;
+
             shipmentImageRepository.save(ShipmentImage.builder()
                     .shipment(shipment)
                     .type(ShipmentImageType.CARGO)
@@ -424,8 +551,11 @@ public class ShipmentService {
     }
 
     private boolean isCompletable(Shipment shipment, Integer remainingMinutes) {
-        boolean etaPassed = shipment.getEstimatedArrivalAt() != null && !LocalDateTime.now().isBefore(shipment.getEstimatedArrivalAt());
+        boolean etaPassed = shipment.getEstimatedArrivalAt() != null
+                && !LocalDateTime.now().isBefore(shipment.getEstimatedArrivalAt());
+
         boolean remainingDone = remainingMinutes != null && remainingMinutes <= 0;
+
         return etaPassed || remainingDone;
     }
 
@@ -444,16 +574,35 @@ public class ShipmentService {
         List<Offer> offers = offerRepository.findByShipment(shipment);
         List<StatusHistory> histories = statusHistoryRepository.findByShipmentOrderByCreatedAtAsc(shipment);
         LocationLog latestLocation = locationLogRepository.findTopByShipmentOrderByCreatedAtDesc(shipment).orElse(null);
-        Integer bestOfferPrice = offers.stream().map(Offer::getPrice).min(Integer::compareTo).orElse(null);
-        boolean bookmarked = viewer != null && shipmentBookmarkRepository.findByUserAndShipment(viewer, shipment).isPresent();
-        boolean hasMyOffer = viewer != null && viewer.getRole() == UserRole.DRIVER && offers.stream().anyMatch(offer -> offer.getDriver().getId().equals(viewer.getId()));
-        boolean assignedToMe = viewer != null && viewer.getRole() == UserRole.DRIVER && shipment.getAssignedDriver() != null && shipment.getAssignedDriver().getId().equals(viewer.getId());
+
+        Integer bestOfferPrice = offers.stream()
+                .map(Offer::getPrice)
+                .min(Integer::compareTo)
+                .orElse(null);
+
+        boolean bookmarked = viewer != null
+                && shipmentBookmarkRepository.findByUserAndShipment(viewer, shipment).isPresent();
+
+        boolean hasMyOffer = viewer != null
+                && viewer.getRole() == UserRole.DRIVER
+                && offers.stream().anyMatch(offer -> offer.getDriver().getId().equals(viewer.getId()));
+
+        boolean assignedToMe = viewer != null
+                && viewer.getRole() == UserRole.DRIVER
+                && shipment.getAssignedDriver() != null
+                && shipment.getAssignedDriver().getId().equals(viewer.getId());
+
         boolean canAccessDetail = viewer != null;
+
         ShipmentDtos.TrackingResponse trackingResponse = resolveTracking(shipment, latestLocation);
+
         var shipperProfile = userService.toPublicProfile(shipment.getShipper());
-        var assignedDriverProfile = shipment.getAssignedDriver() != null ? userService.toPublicProfile(shipment.getAssignedDriver()) : null;
+        var assignedDriverProfile = shipment.getAssignedDriver() != null
+                ? userService.toPublicProfile(shipment.getAssignedDriver())
+                : null;
 
         boolean counterpartyHighCancelBadge = false;
+
         if (viewer != null) {
             if (viewer.getRole() == UserRole.SHIPPER && assignedDriverProfile != null) {
                 counterpartyHighCancelBadge = Boolean.TRUE.equals(assignedDriverProfile.getHighCancelBadge());
@@ -487,6 +636,7 @@ public class ShipmentService {
                 .estimatedMinutes(shipment.getEstimatedMinutes())
                 .estimatedDistanceKm(shipment.getEstimatedDistanceKm())
                 .status(shipment.getStatus())
+
                 .shipperName(shipment.getShipper().getName())
                 .shipperId(shipment.getShipper().getId())
                 .shipperAverageRating(shipperProfile.getAverageRating())
@@ -495,6 +645,7 @@ public class ShipmentService {
                 .shipperProfileImageUrl(shipperProfile.getProfileImageUrl())
                 .shipperContactEmail(shipperProfile.getContactEmail())
                 .shipperContactPhone(shipperProfile.getContactPhone())
+
                 .assignedDriverName(shipment.getAssignedDriver() != null ? shipment.getAssignedDriver().getName() : null)
                 .assignedDriverId(shipment.getAssignedDriver() != null ? shipment.getAssignedDriver().getId() : null)
                 .assignedDriverAverageRating(assignedDriverProfile != null ? assignedDriverProfile.getAverageRating() : null)
@@ -503,25 +654,32 @@ public class ShipmentService {
                 .assignedDriverProfileImageUrl(assignedDriverProfile != null ? assignedDriverProfile.getProfileImageUrl() : null)
                 .assignedDriverContactEmail(assignedDriverProfile != null ? assignedDriverProfile.getContactEmail() : null)
                 .assignedDriverContactPhone(assignedDriverProfile != null ? assignedDriverProfile.getContactPhone() : null)
+
                 .acceptedOfferId(shipment.getAcceptedOfferId())
                 .agreedPrice(shipment.getAgreedPrice())
                 .paid(shipment.isPaid())
                 .paymentMethod(shipment.getPaymentMethod())
                 .paymentCompletedAt(shipment.getPaymentCompletedAt())
+
                 .bookmarked(bookmarked)
                 .hasMyOffer(hasMyOffer)
                 .assignedToMe(assignedToMe)
                 .canAccessDetail(canAccessDetail)
+
                 .bestOfferPrice(bestOfferPrice)
                 .offerCount(offers.size())
+
                 .createdAt(shipment.getCreatedAt())
                 .updatedAt(shipment.getUpdatedAt())
                 .scheduledStartAt(shipment.getScheduledStartAt())
                 .startedAt(shipment.getStartedAt())
                 .estimatedArrivalAt(shipment.getEstimatedArrivalAt())
                 .completedAt(shipment.getCompletedAt())
+
                 .offers(offers.stream().map(this::toOfferResponse).toList())
+
                 .tracking(trackingResponse)
+
                 .histories(histories.stream().map(history -> ShipmentDtos.StatusHistoryResponse.builder()
                         .id(history.getId())
                         .fromStatus(history.getFromStatus())
@@ -530,14 +688,23 @@ public class ShipmentService {
                         .note(history.getNote())
                         .createdAt(history.getCreatedAt())
                         .build()).toList())
-                .cargoImageUrls(shipmentImageRepository.findByShipmentAndTypeOrderByCreatedAtAsc(shipment, ShipmentImageType.CARGO)
-                        .stream().map(ShipmentImage::getDataUrl).toList())
-                .completionImageUrl(shipmentImageRepository.findTopByShipmentAndTypeOrderByCreatedAtDesc(shipment, ShipmentImageType.COMPLETION)
-                        .map(ShipmentImage::getDataUrl).orElse(null))
+
+                .cargoImageUrls(shipmentImageRepository
+                        .findByShipmentAndTypeOrderByCreatedAtAsc(shipment, ShipmentImageType.CARGO)
+                        .stream()
+                        .map(ShipmentImage::getDataUrl)
+                        .toList())
+
+                .completionImageUrl(shipmentImageRepository
+                        .findTopByShipmentAndTypeOrderByCreatedAtDesc(shipment, ShipmentImageType.COMPLETION)
+                        .map(ShipmentImage::getDataUrl)
+                        .orElse(null))
+
                 .cancelPenaltyScore(viewer != null ? viewer.getPenaltyScore30d() : null)
                 .counterpartyHighCancelBadge(counterpartyHighCancelBadge)
                 .viewerMatchingBlockedUntil(viewer != null ? viewer.getMatchingBlockedUntil() : null)
                 .viewerTradingBlockedUntil(viewer != null ? viewer.getTradingBlockedUntil() : null)
+
                 .build();
     }
 
@@ -553,14 +720,34 @@ public class ShipmentService {
                     .build();
         }
 
-        if (shipment.getStatus() == ShipmentStatus.IN_TRANSIT && shipment.getStartedAt() != null && shipment.getEstimatedArrivalAt() != null) {
-            long totalSeconds = Math.max(1L, Duration.between(shipment.getStartedAt(), shipment.getEstimatedArrivalAt()).getSeconds());
+        if (shipment.getStatus() == ShipmentStatus.IN_TRANSIT
+                && shipment.getStartedAt() != null
+                && shipment.getEstimatedArrivalAt() != null) {
+
+            long totalSeconds = Math.max(
+                    1L,
+                    Duration.between(shipment.getStartedAt(), shipment.getEstimatedArrivalAt()).getSeconds()
+            );
+
             long elapsedSeconds = Duration.between(shipment.getStartedAt(), LocalDateTime.now()).getSeconds();
+
             double progress = Math.max(0d, Math.min(1d, elapsedSeconds / (double) totalSeconds));
+
             double latitude = interpolate(shipment.getOriginLat(), shipment.getDestinationLat(), progress);
             double longitude = interpolate(shipment.getOriginLng(), shipment.getDestinationLng(), progress);
-            int remainingMinutes = Math.max(0, (int) Math.ceil((totalSeconds - Math.max(0L, elapsedSeconds)) / 60.0));
-            String roughLocation = progress >= 1d ? "도착지 도착" : progress >= 0.85d ? "도착지 인근 이동" : progress >= 0.35d ? "경로 이동중" : "출발지 출발";
+
+            int remainingMinutes = Math.max(
+                    0,
+                    (int) Math.ceil((totalSeconds - Math.max(0L, elapsedSeconds)) / 60.0)
+            );
+
+            String roughLocation = progress >= 1d
+                    ? "도착지 도착"
+                    : progress >= 0.85d
+                    ? "도착지 인근 이동"
+                    : progress >= 0.35d
+                    ? "경로 이동중"
+                    : "출발지 출발";
 
             return ShipmentDtos.TrackingResponse.builder()
                     .remainingMinutes(remainingMinutes)
@@ -573,7 +760,10 @@ public class ShipmentService {
         }
 
         if (latestLocation != null) {
-            Integer remainingMinutes = latestLocation.getRemainingMinutes() != null ? latestLocation.getRemainingMinutes() : shipment.getEstimatedMinutes();
+            Integer remainingMinutes = latestLocation.getRemainingMinutes() != null
+                    ? latestLocation.getRemainingMinutes()
+                    : shipment.getEstimatedMinutes();
+
             return ShipmentDtos.TrackingResponse.builder()
                     .remainingMinutes(remainingMinutes)
                     .roughLocation(latestLocation.getRoughLocation())
@@ -588,13 +778,18 @@ public class ShipmentService {
     }
 
     private double interpolate(Double from, Double to, double progress) {
-        if (from == null) return to != null ? to : 0d;
-        if (to == null) return from;
+        if (from == null) {
+            return to != null ? to : 0d;
+        }
+        if (to == null) {
+            return from;
+        }
         return from + ((to - from) * progress);
     }
 
     private ShipmentDtos.OfferResponse toOfferResponse(Offer offer) {
         var profile = userService.toPublicProfile(offer.getDriver());
+
         return ShipmentDtos.OfferResponse.builder()
                 .id(offer.getId())
                 .driverName(offer.getDriver().getName())
@@ -623,19 +818,64 @@ public class ShipmentService {
     }
 
     private void validateTradeAvailability(User user) {
+        if (user == null) {
+            throw new RuntimeException("로그인이 필요합니다.");
+        }
+
         LocalDateTime now = LocalDateTime.now();
+
+        applyPenaltyRestrictionIfNeeded(user, now);
+
         if (user.getTradingBlockedUntil() != null && user.getTradingBlockedUntil().isAfter(now)) {
             throw new RuntimeException("현재 거래 금지 상태입니다. 해제 시각: " + user.getTradingBlockedUntil());
         }
+
         if (user.getMatchingBlockedUntil() != null && user.getMatchingBlockedUntil().isAfter(now)) {
             throw new RuntimeException("현재 매칭 제한 상태입니다. 해제 시각: " + user.getMatchingBlockedUntil());
         }
     }
 
+    private void applyPenaltyRestrictionIfNeeded(User user, LocalDateTime now) {
+        int score = user.getPenaltyScore30d() == null ? 0 : user.getPenaltyScore30d();
+
+        if (score >= 20 && !isFuture(user.getTradingBlockedUntil(), now)) {
+            user.setTradingBlockedUntil(now.plusDays(14));
+            user.setPenaltyRatingDelta(minPenaltyDelta(user.getPenaltyRatingDelta(), 0.6));
+        } else if (score >= 15 && !isFuture(user.getTradingBlockedUntil(), now)) {
+            user.setTradingBlockedUntil(now.plusDays(7));
+            user.setPenaltyRatingDelta(minPenaltyDelta(user.getPenaltyRatingDelta(), 0.3));
+        } else if (score >= 10 && !isFuture(user.getTradingBlockedUntil(), now)) {
+            user.setTradingBlockedUntil(now.plusDays(3));
+        } else if (score >= 8 && !isFuture(user.getMatchingBlockedUntil(), now)) {
+            user.setMatchingBlockedUntil(now.plusHours(72));
+            user.setHighCancelBadge(true);
+            user.setPenaltyRatingDelta(minPenaltyDelta(user.getPenaltyRatingDelta(), 0.1));
+        } else if (score >= 5 && !isFuture(user.getMatchingBlockedUntil(), now)) {
+            user.setMatchingBlockedUntil(now.plusHours(24));
+        } else if (score >= 3 && !isFuture(user.getMatchingBlockedUntil(), now)) {
+            user.setMatchingBlockedUntil(now.plusHours(2));
+        }
+
+        if (score >= 8) {
+            user.setHighCancelBadge(true);
+        }
+
+        userRepository.save(user);
+    }
+
+    private boolean isFuture(LocalDateTime target, LocalDateTime now) {
+        return target != null && target.isAfter(now);
+    }
+
     private boolean canCancel(Shipment shipment, User actor) {
-        if (actor.getRole() == UserRole.ADMIN) return true;
-        if (shipment.getShipper() != null && shipment.getShipper().getId().equals(actor.getId())) return true;
-        return shipment.getAssignedDriver() != null && shipment.getAssignedDriver().getId().equals(actor.getId());
+        if (actor.getRole() == UserRole.ADMIN) {
+            return true;
+        }
+        if (shipment.getShipper() != null && shipment.getShipper().getId().equals(actor.getId())) {
+            return true;
+        }
+        return shipment.getAssignedDriver() != null
+                && shipment.getAssignedDriver().getId().equals(actor.getId());
     }
 
     private LocalDateTime resolveScheduledStartAt(Shipment shipment) {
@@ -645,18 +885,24 @@ public class ShipmentService {
         if (shipment.getStartedAt() != null) {
             return shipment.getStartedAt();
         }
-        return shipment.getCreatedAt() != null ? shipment.getCreatedAt().plusHours(48) : LocalDateTime.now().plusHours(48);
+        return shipment.getCreatedAt() != null
+                ? shipment.getCreatedAt().plusHours(48)
+                : LocalDateTime.now().plusHours(48);
     }
 
     private int calculateTimingPenalty(Shipment shipment) {
         LocalDateTime now = LocalDateTime.now();
+
         if (shipment.getStartedAt() != null || shipment.getStatus() == ShipmentStatus.IN_TRANSIT) {
             return 6;
         }
+
         LocalDateTime scheduledStartAt = resolveScheduledStartAt(shipment);
+
         if (!now.isBefore(scheduledStartAt)) {
             return 6;
         }
+
         long minutes = Duration.between(now, scheduledStartAt).toMinutes();
 
         if (minutes <= 60) {
@@ -680,23 +926,30 @@ public class ShipmentService {
     }
 
     private User resolveDisputeTarget(Shipment shipment, User actor, CancelReason reason) {
-        if (!isDisputedReason(reason)) return null;
+        if (!isDisputedReason(reason)) {
+            return null;
+        }
+
         if (shipment.getShipper() != null && shipment.getShipper().getId().equals(actor.getId())) {
             return shipment.getAssignedDriver();
         }
+
         return shipment.getShipper();
     }
 
     private String applyPenalty(User user, int penalty) {
         LocalDateTime now = LocalDateTime.now();
+
         refreshPenaltyWindow(user, now);
 
         int newScore = (user.getPenaltyScore30d() == null ? 0 : user.getPenaltyScore30d()) + penalty;
+
         user.setPenaltyScore30d(newScore);
         user.setCancelCount((user.getCancelCount() == null ? 0 : user.getCancelCount()) + 1);
 
         long denominator = (long) (user.getCancelCount() == null ? 0 : user.getCancelCount())
                 + (long) (user.getCompletedTransactionCount() == null ? 0 : user.getCompletedTransactionCount());
+
         if (denominator > 0) {
             double rate = ((double) user.getCancelCount() / denominator) * 100.0;
             user.setCancelRate(Math.round(rate * 10.0) / 10.0);
@@ -705,6 +958,7 @@ public class ShipmentService {
         }
 
         String action;
+
         if (newScore >= 20) {
             user.setTradingBlockedUntil(now.plusDays(14));
             user.setPenaltyRatingDelta(minPenaltyDelta(user.getPenaltyRatingDelta(), 0.6));
@@ -731,7 +985,8 @@ public class ShipmentService {
             action = "점수 누적만 반영";
         }
 
-        if ((user.getCancelRate() != null && user.getCancelRate() >= 20d && denominator >= 20) || newScore >= 8) {
+        if ((user.getCancelRate() != null && user.getCancelRate() >= 20d && denominator >= 20)
+                || newScore >= 8) {
             user.setHighCancelBadge(true);
         }
 
@@ -741,20 +996,26 @@ public class ShipmentService {
 
     private void refreshPenaltyWindow(User user, LocalDateTime now) {
         LocalDateTime start = now.minusDays(30);
-        List<ShipmentCancelHistory> recentCancels = shipmentCancelHistoryRepository.findByCanceledByAndCanceledAtAfterOrderByCanceledAtDesc(user, start);
+
+        List<ShipmentCancelHistory> recentCancels =
+                shipmentCancelHistoryRepository.findByCanceledByAndCanceledAtAfterOrderByCanceledAtDesc(user, start);
+
         int recalculated = recentCancels.stream()
                 .map(ShipmentCancelHistory::getFinalPenaltyScore)
                 .filter(score -> score != null)
                 .mapToInt(Integer::intValue)
                 .sum();
+
         user.setPenaltyScore30d(recalculated);
 
         if (user.getMatchingBlockedUntil() != null && user.getMatchingBlockedUntil().isBefore(now)) {
             user.setMatchingBlockedUntil(null);
         }
+
         if (user.getTradingBlockedUntil() != null && user.getTradingBlockedUntil().isBefore(now)) {
             user.setTradingBlockedUntil(null);
         }
+
         if ((user.getCancelRate() == null || user.getCancelRate() < 20d) && recalculated < 8) {
             user.setHighCancelBadge(false);
         }
@@ -766,14 +1027,22 @@ public class ShipmentService {
     }
 
     private void incrementCompletedCount(User user) {
-        if (user == null) return;
-        user.setCompletedTransactionCount((user.getCompletedTransactionCount() == null ? 0 : user.getCompletedTransactionCount()) + 1);
+        if (user == null) {
+            return;
+        }
+
+        user.setCompletedTransactionCount(
+                (user.getCompletedTransactionCount() == null ? 0 : user.getCompletedTransactionCount()) + 1
+        );
+
         long denominator = (long) (user.getCancelCount() == null ? 0 : user.getCancelCount())
                 + (long) user.getCompletedTransactionCount();
+
         if (denominator > 0) {
             double rate = ((double) (user.getCancelCount() == null ? 0 : user.getCancelCount()) / denominator) * 100.0;
             user.setCancelRate(Math.round(rate * 10.0) / 10.0);
         }
+
         userRepository.save(user);
     }
 
@@ -795,12 +1064,16 @@ public class ShipmentService {
 
     private double estimateDistanceKm(Double lat1, Double lng1, Double lat2, Double lng2) {
         double earthRadius = 6371.0;
+
         double dLat = Math.toRadians(lat2 - lat1);
         double dLng = Math.toRadians(lng2 - lng1);
+
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
                 * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
         return Math.round(earthRadius * c * 10) / 10.0;
     }
 }
