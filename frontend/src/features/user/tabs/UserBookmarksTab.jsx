@@ -1,4 +1,3 @@
-import SectionTitle from '../../../components/common/SectionTitle'
 import { statusText, formatMinutesToHourMinute } from '../../../utils/formatters'
 import { useEffect, useState, useMemo } from 'react'
 
@@ -69,16 +68,10 @@ export default function UserBookmarksTab({ controller }) {
   )
 
   return (
-    <>
-      {renderStatusFilter('bookmark-status-filter--mobile')}
+    <div className="bookmark-tab">
+      {renderStatusFilter('bookmark-status-filter--external')}
 
       <div className="surface table-surface bookmark-table-surface">
-        <div className="table-head">
-          <div className="table-head-row">
-            <SectionTitle title="관심 화물 목록" />
-            {renderStatusFilter('bookmark-status-filter--desktop')}
-          </div>
-        </div>
         <div className="bookmark-table-wrap">
           <table className="board-table">
             <thead>
@@ -148,6 +141,6 @@ export default function UserBookmarksTab({ controller }) {
           ↔ 좌우로 스크롤
         </div>
       </div>
-    </>
+    </div>
   )
 }
