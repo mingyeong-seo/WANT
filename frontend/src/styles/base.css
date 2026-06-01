@@ -567,3 +567,20 @@ textarea {
   font-size: 12px;
   font-weight: 400;
 }
+
+.board-filter-wrap {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.shipment-filter-wrap {
+  margin-bottom: -5px;
+}
+
+.shipment-board-page .shipment-filter-wrap {
+  margin-top: -8px;
+}
+
+.shipment-table .board-table {
+  margin-top: 0 !important;
+}
