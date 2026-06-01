@@ -1364,6 +1364,16 @@ body.theme-admin .app-logo__image {
     width: 112px;
     height: 44px;
   }
+
+  /* 화주&차주 찾기 */
+  .public-directory-shell .public-directory-card__info,
+  .public-directory-shell .public-directory-card__info * {
+    display: none !important;
+  }
+
+  .public-directory-shell .public-directory-card>p {
+    display: none;
+  }
 }
 
 /* =========================

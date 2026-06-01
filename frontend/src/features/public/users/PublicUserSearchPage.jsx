@@ -73,12 +73,11 @@ export default function PublicUserSearchPage({ controller, role }) {
             <span>{isDriver ? "DRIVER DIRECTORY" : "SHIPPER DIRECTORY"}</span>
             <h2>
               {isDriver
-                ? "가입된 차주를 한 번에 보고 이름으로 바로 찾을 수 있습니다."
-                : "가입된 화주를 한 번에 보고 이름으로 바로 찾을 수 있습니다."}
+                ? "등록된 차주 정보를 조회하고 검색할 수 있습니다."
+                : "등록된 화주 정보를 조회하고 검색할 수 있습니다."}
             </h2>
             <p>
-              헤더는 그대로 유지하고, 아래 탭에서 화주와 차주를 바로 전환할 수
-              있도록 구성했습니다.
+              필요한 거래 상대를 검색하고 프로필 정보를 확인해 보세요.
             </p>
           </div>
 
