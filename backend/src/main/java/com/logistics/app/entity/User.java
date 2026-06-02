@@ -60,6 +60,17 @@ public class User {
     private Boolean highCancelBadge;
     private Double penaltyRatingDelta;
 
+    @Builder.Default
+    private Integer miniGameWeeklyWins = 0;
+
+    @Builder.Default
+    private Integer discountCouponCount = 0;
+
+    @Builder.Default
+    private Integer driverFeeCouponCount = 0;
+
+    private LocalDateTime lastCouponIssuedAt;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -91,6 +102,15 @@ public class User {
         if (penaltyRatingDelta == null) {
             penaltyRatingDelta = 0d;
         }
+        if (miniGameWeeklyWins == null) {
+            miniGameWeeklyWins = 0;
+        }
+        if (discountCouponCount == null) {
+            discountCouponCount = 0;
+        }
+        if (driverFeeCouponCount == null) {
+            driverFeeCouponCount = 0;
+        }
     }
 
     @PreUpdate
@@ -119,6 +139,15 @@ public class User {
         }
         if (penaltyRatingDelta == null) {
             penaltyRatingDelta = 0d;
+        }
+        if (miniGameWeeklyWins == null) {
+            miniGameWeeklyWins = 0;
+        }
+        if (discountCouponCount == null) {
+            discountCouponCount = 0;
+        }
+        if (driverFeeCouponCount == null) {
+            driverFeeCouponCount = 0;
         }
     }
 }

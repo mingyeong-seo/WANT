@@ -483,6 +483,7 @@ export function useLogisticsController() {
   const [paymentModalStep, setPaymentModalStep] = useState("summary");
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState("REGISTERED");
+  const [useDiscountCoupon, setUseDiscountCoupon] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantDraft, setAssistantDraft] = useState("");
   const [assistantSending, setAssistantSending] = useState(false);
@@ -1879,6 +1880,7 @@ export function useLogisticsController() {
       ? "REGISTERED"
       : "CARD";
     setSelectedPaymentMethod(preferredMethod);
+    setUseDiscountCoupon(false);
     setPaymentModalStep("summary");
     setPaymentModalOpen(true);
   };
@@ -1888,6 +1890,7 @@ export function useLogisticsController() {
       ? "REGISTERED"
       : "CARD";
     setSelectedPaymentMethod(preferredMethod);
+    setUseDiscountCoupon(false);
     setPaymentModalStep("summary");
     setPaymentModalOpen(false);
   };
@@ -1966,6 +1969,7 @@ export function useLogisticsController() {
       setPaymentSubmitting(true);
       const response = await payShipment(selectedId, {
         paymentMethod: resolveSelectedPaymentMethodLabel(),
+        useDiscountCoupon,
       });
       setMessage(response?.message || "결제가 완료되었습니다.");
       await Promise.all([
@@ -2427,6 +2431,8 @@ export function useLogisticsController() {
     paymentModalOpen,
     paymentModalStep,
     selectedPaymentMethod,
+    useDiscountCoupon,
+    setUseDiscountCoupon,
     unreadChatCount,
     notificationUnreadCount,
     shipments,

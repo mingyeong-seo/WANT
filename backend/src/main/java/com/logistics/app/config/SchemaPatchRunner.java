@@ -38,6 +38,10 @@ public class SchemaPatchRunner implements CommandLineRunner {
         addColumnIfMissing("users", "high_cancel_badge", "boolean");
         addColumnIfMissing("users", "penalty_rating_delta", "double precision");
         addColumnIfMissing("users", "profile_completed", "boolean");
+        addColumnIfMissing("users", "mini_game_weekly_wins", "integer");
+        addColumnIfMissing("users", "discount_coupon_count", "integer");
+        addColumnIfMissing("users", "driver_fee_coupon_count", "integer");
+        addColumnIfMissing("users", "last_coupon_issued_at", "timestamp");
 
         jdbcTemplate.execute("UPDATE users SET status = 'ACTIVE' WHERE status IS NULL OR status = ''");
         jdbcTemplate.execute("UPDATE users SET penalty_score30d = 0 WHERE penalty_score30d IS NULL");
@@ -47,6 +51,9 @@ public class SchemaPatchRunner implements CommandLineRunner {
         jdbcTemplate.execute("UPDATE users SET high_cancel_badge = FALSE WHERE high_cancel_badge IS NULL");
         jdbcTemplate.execute("UPDATE users SET penalty_rating_delta = 0 WHERE penalty_rating_delta IS NULL");
         jdbcTemplate.execute("UPDATE users SET profile_completed = FALSE WHERE profile_completed IS NULL");
+        jdbcTemplate.execute("UPDATE users SET mini_game_weekly_wins = 0 WHERE mini_game_weekly_wins IS NULL");
+        jdbcTemplate.execute("UPDATE users SET discount_coupon_count = 0 WHERE discount_coupon_count IS NULL");
+        jdbcTemplate.execute("UPDATE users SET driver_fee_coupon_count = 0 WHERE driver_fee_coupon_count IS NULL");
 
         jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN status SET DEFAULT 'ACTIVE'");
         jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN status SET NOT NULL");

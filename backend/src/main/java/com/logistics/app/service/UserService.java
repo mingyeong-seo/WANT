@@ -123,6 +123,10 @@ public class UserService {
                 .matchingBlockedUntil(user.getMatchingBlockedUntil())
                 .tradingBlockedUntil(user.getTradingBlockedUntil())
                 .highCancelBadge(Boolean.TRUE.equals(user.getHighCancelBadge()))
+                .miniGameWeeklyWins(user.getMiniGameWeeklyWins())
+                .discountCouponCount(user.getDiscountCouponCount())
+                .driverFeeCouponCount(user.getDriverFeeCouponCount())
+                .lastCouponIssuedAt(user.getLastCouponIssuedAt())
                 .build();
     }
 
@@ -163,6 +167,10 @@ public class UserService {
                 .matchingBlockedUntil(user.getMatchingBlockedUntil())
                 .tradingBlockedUntil(user.getTradingBlockedUntil())
                 .highCancelBadge(Boolean.TRUE.equals(user.getHighCancelBadge()))
+                .miniGameWeeklyWins(user.getMiniGameWeeklyWins())
+                .discountCouponCount(user.getDiscountCouponCount())
+                .driverFeeCouponCount(user.getDriverFeeCouponCount())
+                .lastCouponIssuedAt(user.getLastCouponIssuedAt())
                 .build();
     }
 
@@ -190,6 +198,10 @@ public class UserService {
                 .matchingBlockedUntil(user.getMatchingBlockedUntil())
                 .tradingBlockedUntil(user.getTradingBlockedUntil())
                 .highCancelBadge(Boolean.TRUE.equals(user.getHighCancelBadge()))
+                .miniGameWeeklyWins(user.getMiniGameWeeklyWins())
+                .discountCouponCount(user.getDiscountCouponCount())
+                .driverFeeCouponCount(user.getDriverFeeCouponCount())
+                .lastCouponIssuedAt(user.getLastCouponIssuedAt())
                 .build();
     }
 }

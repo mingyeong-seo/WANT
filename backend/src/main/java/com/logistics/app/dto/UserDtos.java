@@ -49,6 +49,10 @@ public class UserDtos {
         private LocalDateTime matchingBlockedUntil;
         private LocalDateTime tradingBlockedUntil;
         private Boolean highCancelBadge;
+        private Integer miniGameWeeklyWins;
+        private Integer discountCouponCount;
+        private Integer driverFeeCouponCount;
+        private LocalDateTime lastCouponIssuedAt;
     }
 
     @Data
@@ -71,6 +75,10 @@ public class UserDtos {
         private LocalDateTime matchingBlockedUntil;
         private LocalDateTime tradingBlockedUntil;
         private Boolean highCancelBadge;
+        private Integer miniGameWeeklyWins;
+        private Integer discountCouponCount;
+        private Integer driverFeeCouponCount;
+        private LocalDateTime lastCouponIssuedAt;
     }
 
     @Data
@@ -93,5 +101,9 @@ public class UserDtos {
         private LocalDateTime matchingBlockedUntil;
         private LocalDateTime tradingBlockedUntil;
         private Boolean highCancelBadge;
+        private Integer miniGameWeeklyWins;
+        private Integer discountCouponCount;
+        private Integer driverFeeCouponCount;
+        private LocalDateTime lastCouponIssuedAt;
     }
 }

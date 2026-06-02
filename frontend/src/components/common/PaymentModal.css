@@ -396,3 +396,49 @@
     grid-template-columns: 1fr;
   }
 }
+
+.payment-coupon-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 16px;
+  background: rgba(37, 99, 235, 0.06);
+  color: #172554;
+  cursor: pointer;
+}
+
+.payment-coupon-box input {
+  width: 18px;
+  height: 18px;
+  accent-color: #2563eb;
+}
+
+.payment-coupon-box span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 700;
+}
+
+.payment-coupon-box small {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.payment-coupon-box.is-disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.payment-coupon-discount {
+  margin: -4px 0 10px;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 800;
+}

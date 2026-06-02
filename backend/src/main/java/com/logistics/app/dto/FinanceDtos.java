@@ -28,6 +28,7 @@ public class FinanceDtos {
     @Data
     public static class ShipmentPaymentRequest {
         private String paymentMethod;
+        private Boolean useDiscountCoupon;
     }
 
     @Data
@@ -36,6 +37,10 @@ public class FinanceDtos {
         private Long shipmentId;
         private String shipmentTitle;
         private Integer amount;
+        private Integer originalAmount;
+        private Integer discountAmount;
+        private Boolean couponUsed;
+        private Integer remainingCouponCount;
         private boolean paid;
         private LocalDateTime paidAt;
         private String paymentMethod;

@@ -45,12 +45,17 @@ export default function PaymentModal({ controller }) {
     paymentSubmitting,
     selectedPaymentMethod,
     setSelectedPaymentMethod,
+    useDiscountCoupon,
+    setUseDiscountCoupon,
     handlePayShipment,
   } = controller
 
   if (!paymentModalOpen || !selected) return null
 
   const amount = selected.agreedPrice || selected.bestOfferPrice || 0
+  const couponCount = profile?.discountCouponCount || 0
+  const discountAmount = useDiscountCoupon && couponCount > 0 ? Math.floor(amount * 0.05) : 0
+  const finalAmount = Math.max(0, amount - discountAmount)
   const registeredMethod = profile?.paymentMethod?.trim()
   const registeredLabel = registeredMethod || '프로필에 등록된 결제수단 없음'
   const currentMethodLabel = selectedPaymentMethod === 'REGISTERED'
@@ -99,7 +104,23 @@ export default function PaymentModal({ controller }) {
               <div className="payment-modal-panel payment-modal-panel--summary">
                 <div className="payment-modal-eyebrow">SUMMARY</div>
                 <h3 className="payment-modal-title">최종 결제 금액</h3>
-                <div className="payment-modal-amount">{formatCurrency(amount)}</div>
+                <div className="payment-modal-amount">{formatCurrency(finalAmount)}</div>
+                {useDiscountCoupon && couponCount > 0 ? (
+                  <p className="payment-coupon-discount">쿠폰 할인 {formatCurrency(discountAmount)} 적용</p>
+                ) : null}
+
+                <label className={`payment-coupon-box${couponCount <= 0 ? ' is-disabled' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(useDiscountCoupon)}
+                    onChange={(e) => setUseDiscountCoupon(e.target.checked)}
+                    disabled={couponCount <= 0 || selected.paid}
+                  />
+                  <span>
+                    미니게임 운송비 할인 쿠폰 사용
+                    <small>보유 {couponCount}장 · 운송비 5% 할인</small>
+                  </span>
+                </label>
 
                 <div className="payment-modal-status-card">
                   <div className="payment-modal-label">현재 상태</div>
@@ -110,7 +131,7 @@ export default function PaymentModal({ controller }) {
                 {!selected.paid ? (
                   <>
                     <button className="payment-modal-primary" type="button" onClick={openPaymentMethodStep}>
-                      {formatCurrency(amount)} 결제하기
+                      {formatCurrency(finalAmount)} 결제하기
                     </button>
                     <button className="payment-modal-secondary" type="button" onClick={closePaymentModal}>
                       닫기
@@ -168,7 +189,7 @@ export default function PaymentModal({ controller }) {
                 onClick={handlePayShipment}
                 disabled={paymentSubmitting || selected.paid}
               >
-                {paymentSubmitting ? '결제 처리 중...' : `${formatCurrency(amount)} 결제`}
+                {paymentSubmitting ? '결제 처리 중...' : `${formatCurrency(finalAmount)} 결제`}
               </button>
             </div>
 
@@ -187,7 +208,7 @@ export default function PaymentModal({ controller }) {
               <div className="payment-complete-step__meta">
                 <div>
                   <span className="payment-modal-label">결제 금액</span>
-                  <strong>{formatCurrency(amount)}</strong>
+                  <strong>{formatCurrency(finalAmount)}</strong>
                 </div>
                 <div>
                   <span className="payment-modal-label">결제수단</span>

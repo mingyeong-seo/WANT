@@ -294,6 +294,9 @@ export const leaveQuickDrawRoom = async (roomCode) =>
   (await api.delete(`/api/game/quickdraw/rooms/${roomCode}`)).data;
 
 
+export const fetchRoundsLiteLeaderboard = async () =>
+  (await api.get('/api/game/rounds-lite/leaderboard')).data;
+
 export const createRoundsLiteRoom = async () =>
   (await api.post('/api/game/rounds-lite/rooms')).data;
 
