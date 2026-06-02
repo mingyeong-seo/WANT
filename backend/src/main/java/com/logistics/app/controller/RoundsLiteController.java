@@ -4,6 +4,7 @@ import com.logistics.app.dto.GameDtos;
 import com.logistics.app.entity.User;
 import com.logistics.app.service.AuthService;
 import com.logistics.app.service.RoundsLiteService;
+import com.logistics.app.service.MiniGameRewardService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,11 +13,18 @@ import org.springframework.web.bind.annotation.*;
 public class RoundsLiteController {
 
     private final RoundsLiteService roundsLiteService;
+    private final MiniGameRewardService miniGameRewardService;
     private final AuthService authService;
 
-    public RoundsLiteController(RoundsLiteService roundsLiteService, AuthService authService) {
+    public RoundsLiteController(RoundsLiteService roundsLiteService, MiniGameRewardService miniGameRewardService, AuthService authService) {
         this.roundsLiteService = roundsLiteService;
+        this.miniGameRewardService = miniGameRewardService;
         this.authService = authService;
+    }
+
+    @GetMapping("/leaderboard")
+    public java.util.List<GameDtos.MiniGameLeaderboardItem> leaderboard() {
+        return miniGameRewardService.getWeeklyLeaderboard();
     }
 
     @PostMapping("/rooms")

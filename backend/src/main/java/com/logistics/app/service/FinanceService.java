@@ -202,18 +202,57 @@ public class FinanceService {
                 ? acceptedOffer.getPrice()
                 : nvl(shipment.getAgreedPrice());
         int feeAmount = (int) Math.floor(grossAmount * (SERVICE_FEE_RATE / 100.0));
-        int netAmount = Math.max(grossAmount - feeAmount, 0);
+        int driverFeeAmount = feeAmount;
+        int netAmount = Math.max(grossAmount - driverFeeAmount, 0);
+        String driverDescription = "운행 완료 정산";
         String paymentMethod = shipment.getPaymentMethod();
 
+        if (shipment.getAssignedDriver() != null) {
+            List<MoneyTransaction> existingEarnTransactions = moneyTransactionRepository.findByShipmentAndTypeOrderByCreatedAtAsc(shipment, TransactionType.EARN);
+            boolean alreadySettled = !existingEarnTransactions.isEmpty();
+            boolean couponAlreadyApplied = alreadySettled
+                    && existingEarnTransactions.get(0).getDescription() != null
+                    && existingEarnTransactions.get(0).getDescription().contains("정산 수수료 50% 할인 쿠폰 적용");
+
+            if (couponAlreadyApplied) {
+                driverFeeAmount = nvl(existingEarnTransactions.get(0).getFeeAmount());
+                netAmount = Math.max(grossAmount - driverFeeAmount, 0);
+                driverDescription = "운행 완료 정산 - 정산 수수료 50% 할인 쿠폰 적용";
+            } else if (!alreadySettled) {
+                User driver = shipment.getAssignedDriver();
+                int driverCoupons = driver.getDriverFeeCouponCount() == null ? 0 : driver.getDriverFeeCouponCount();
+                if (driverCoupons > 0 && feeAmount > 0) {
+                    driverFeeAmount = (int) Math.floor(feeAmount * 0.5);
+                    netAmount = Math.max(grossAmount - driverFeeAmount, 0);
+                    driverDescription = "운행 완료 정산 - 정산 수수료 50% 할인 쿠폰 적용";
+                    driver.setDriverFeeCouponCount(Math.max(0, driverCoupons - 1));
+                    userRepository.save(driver);
+                }
+            }
+        }
+
         if (shipment.getShipper() != null) {
+            int shipperGrossAmount = grossAmount;
+            int shipperDiscountAmount = 0;
+            int shipperNetAmount = grossAmount;
+            String shipperDescription = shipment.isPaid() ? "운송 결제 완료" : "배차 완료 결제";
+            List<MoneyTransaction> existingSpendTransactions = moneyTransactionRepository.findByShipmentAndTypeOrderByCreatedAtAsc(shipment, TransactionType.SPEND);
+            if (!existingSpendTransactions.isEmpty() && nvl(existingSpendTransactions.get(0).getFeeAmount()) > 0) {
+                MoneyTransaction existingSpend = existingSpendTransactions.get(0);
+                shipperGrossAmount = nvl(existingSpend.getGrossAmount());
+                shipperDiscountAmount = nvl(existingSpend.getFeeAmount());
+                shipperNetAmount = nvl(existingSpend.getNetAmount());
+                shipperDescription = existingSpend.getDescription() != null ? existingSpend.getDescription() : "운송 결제 완료 - 운송비 5% 할인 쿠폰 적용";
+            }
+
             ensureSingleTransaction(
                     shipment,
                     shipment.getShipper(),
                     TransactionType.SPEND,
-                    grossAmount,
-                    0,
-                    grossAmount,
-                    shipment.isPaid() ? "운송 결제 완료" : "배차 완료 결제",
+                    shipperGrossAmount,
+                    shipperDiscountAmount,
+                    shipperNetAmount,
+                    shipperDescription,
                     paymentMethod
             );
         }
@@ -224,9 +263,9 @@ public class FinanceService {
                     shipment.getAssignedDriver(),
                     TransactionType.EARN,
                     grossAmount,
-                    feeAmount,
+                    driverFeeAmount,
                     netAmount,
-                    "운행 완료 정산",
+                    driverDescription,
                     paymentMethod
             );
         }
@@ -237,9 +276,9 @@ public class FinanceService {
                     adminUser,
                     TransactionType.FEE,
                     grossAmount,
-                    feeAmount,
-                    feeAmount,
-                    "플랫폼 수수료 수익",
+                    driverFeeAmount,
+                    driverFeeAmount,
+                    driverFeeAmount < feeAmount ? "플랫폼 수수료 수익 - 차주 수수료 할인 쿠폰 적용" : "플랫폼 수수료 수익",
                     paymentMethod
             );
         }
@@ -392,12 +431,31 @@ public class FinanceService {
 
         Offer acceptedOffer = offerRepository.findById(shipment.getAcceptedOfferId())
                 .orElseThrow(() -> new RuntimeException("확정된 제안 정보를 찾을 수 없습니다."));
-        int amount = acceptedOffer.getPrice() == null ? 0 : acceptedOffer.getPrice();
+        int originalAmount = acceptedOffer.getPrice() == null ? 0 : acceptedOffer.getPrice();
+        boolean useDiscountCoupon = request != null && Boolean.TRUE.equals(request.getUseDiscountCoupon());
+        int availableCoupons = user.getDiscountCouponCount() == null ? 0 : user.getDiscountCouponCount();
+        int discountAmount = 0;
+        boolean couponUsed = false;
+
+        if (useDiscountCoupon) {
+            if (availableCoupons <= 0) {
+                throw new RuntimeException("사용 가능한 할인 쿠폰이 없습니다.");
+            }
+            discountAmount = Math.max(0, (int) Math.floor(originalAmount * 0.05));
+            couponUsed = discountAmount > 0;
+            user.setDiscountCouponCount(Math.max(0, availableCoupons - 1));
+        }
+
+        int amount = Math.max(0, originalAmount - discountAmount);
         String paymentMethod = request != null && request.getPaymentMethod() != null && !request.getPaymentMethod().isBlank()
                 ? request.getPaymentMethod().trim()
                 : "등록된 결제수단";
 
-        shipment.setAgreedPrice(amount);
+        if (couponUsed) {
+            userRepository.save(user);
+        }
+
+        shipment.setAgreedPrice(originalAmount);
         shipment.setPaid(true);
         shipment.setPaymentMethod(paymentMethod);
         shipment.setPaymentCompletedAt(java.time.LocalDateTime.now());
@@ -408,10 +466,10 @@ public class FinanceService {
                     .user(shipment.getShipper())
                     .shipment(shipment)
                     .type(TransactionType.SPEND)
-                    .grossAmount(amount)
-                    .feeAmount(0)
+                    .grossAmount(originalAmount)
+                    .feeAmount(discountAmount)
                     .netAmount(amount)
-                    .description("운송 결제 완료")
+                    .description(couponUsed ? "운송 결제 완료 - 운송비 5% 할인 쿠폰 적용" : "운송 결제 완료")
                     .paymentMethod(paymentMethod)
                     .build());
         }
@@ -428,10 +486,14 @@ public class FinanceService {
                 .shipmentId(shipment.getId())
                 .shipmentTitle(shipment.getTitle())
                 .amount(amount)
+                .originalAmount(originalAmount)
+                .discountAmount(discountAmount)
+                .couponUsed(couponUsed)
+                .remainingCouponCount(user.getDiscountCouponCount())
                 .paid(true)
                 .paidAt(shipment.getPaymentCompletedAt())
                 .paymentMethod(paymentMethod)
-                .message("결제가 완료되었습니다.")
+                .message(couponUsed ? "운송비 5% 할인 쿠폰이 적용되어 결제가 완료되었습니다." : "결제가 완료되었습니다.")
                 .build();
     }
 

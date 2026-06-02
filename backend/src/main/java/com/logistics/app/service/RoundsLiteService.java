@@ -82,13 +82,16 @@ public class RoundsLiteService {
     private final RoundsLiteRoomRepository roomRepository;
     private final RoundsLitePlayerRepository playerRepository;
     private final ObjectMapper objectMapper;
+    private final MiniGameRewardService miniGameRewardService;
 
     public RoundsLiteService(RoundsLiteRoomRepository roomRepository,
                              RoundsLitePlayerRepository playerRepository,
-                             ObjectMapper objectMapper) {
+                             ObjectMapper objectMapper,
+                             MiniGameRewardService miniGameRewardService) {
         this.roomRepository = roomRepository;
         this.playerRepository = playerRepository;
         this.objectMapper = objectMapper;
+        this.miniGameRewardService = miniGameRewardService;
     }
 
     public GameDtos.RoundsLiteRoomResponse createRoom(User user) {
@@ -707,6 +710,7 @@ public class RoundsLiteService {
             room.setCardOptionsJson("[]");
             room.setCountdownEndsAt(null);
             room.setMessage(winner.getName() + " 님이 " + targetWins + "승을 달성해 매치에서 승리했습니다.");
+            miniGameRewardService.recordMatchWin(winner.getUser());
             return;
         }
 

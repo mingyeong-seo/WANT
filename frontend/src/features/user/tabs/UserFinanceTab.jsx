@@ -12,7 +12,7 @@ const emptyReceiptModalState = {
 }
 
 export default function UserFinanceTab({ controller }) {
-  const { auth, financeSummary, financeTransactions } = controller
+  const { auth, profile, financeSummary, financeTransactions } = controller
 
   const [receiptModal, setReceiptModal] = useState(emptyReceiptModalState)
 
@@ -59,14 +59,14 @@ export default function UserFinanceTab({ controller }) {
             <div className="kpi-card"><span>총 사용 금액</span><strong>{formatCurrency(financeSummary.totalSpent)}</strong><p>완료 정산 기준 누적</p></div>
             <div className="kpi-card"><span>지불 수수료</span><strong>{formatCurrency(0)}</strong><p>수수료는 차주 정산 금액에서만 차감됩니다.</p></div>
             <div className="kpi-card"><span>완료 배차</span><strong>{financeSummary.completedShipmentCount}건</strong></div>
-            <div className="kpi-card"><span>거래 건수</span><strong>{financeSummary.transactionCount}건</strong></div>
+            <div className="kpi-card"><span>운송비 할인 쿠폰</span><strong>{profile?.discountCouponCount || 0}장</strong><p>미니게임 보상 · 운송비 5% 할인</p></div>
           </>
         ) : (
           <>
             <div className="kpi-card"><span>총 수익 원금</span><strong>{formatCurrency(financeSummary.totalGrossEarned)}</strong><p>수수료 차감 전</p></div>
             <div className="kpi-card"><span>실수익</span><strong>{formatCurrency(financeSummary.totalNetEarned)}</strong><p>{financeSummary.serviceFeeRate}% 수수료 차감 후</p></div>
             <div className="kpi-card"><span>차감 수수료</span><strong>{formatCurrency(financeSummary.totalFeePaid)}</strong></div>
-            <div className="kpi-card"><span>완료 운행</span><strong>{financeSummary.completedShipmentCount}건</strong></div>
+            <div className="kpi-card"><span>수수료 할인 쿠폰</span><strong>{profile?.driverFeeCouponCount || 0}장</strong><p>미니게임 보상 · 정산 수수료 50% 할인</p></div>
           </>
         )}
       </div>

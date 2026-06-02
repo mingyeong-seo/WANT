@@ -42,6 +42,17 @@ public class GameDtos {
     }
 
     @Data
+    @Builder
+    public static class MiniGameLeaderboardItem {
+        private int rank;
+        private Long userId;
+        private String name;
+        private String role;
+        private int weeklyWins;
+        private String rewardLabel;
+    }
+
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RoundsLiteInputRequest {

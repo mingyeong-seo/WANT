@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   cancelRoundsLiteMatchmaking,
   createRoundsLiteRoom,
+  fetchRoundsLiteLeaderboard,
   getRoundsLiteState,
   joinRoundsLiteMatchmaking,
   joinRoundsLiteRoom,
@@ -92,6 +93,8 @@ export default function RoundsLiteArena({ controller }) {
   const [room, setRoom] = useState(null)
   const [displayRoom, setDisplayRoom] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [leaderboard, setLeaderboard] = useState([])
+  const [leaderboardError, setLeaderboardError] = useState('')
   const [error, setError] = useState('')
   const [tick, setTick] = useState(Date.now())
   const [copied, setCopied] = useState(false)
@@ -184,7 +187,11 @@ export default function RoundsLiteArena({ controller }) {
       fetchState(savedRoom, true)
     }
 
+    loadLeaderboard(true)
+    const leaderboardTimer = window.setInterval(() => loadLeaderboard(true), 5000)
+
     return () => {
+      window.clearInterval(leaderboardTimer)
       stopLoops()
     }
   }, [])
@@ -281,6 +288,18 @@ export default function RoundsLiteArena({ controller }) {
     animationRef.current = requestAnimationFrame(animate)
   }
 
+  async function loadLeaderboard(silent = false) {
+    try {
+      const response = await fetchRoundsLiteLeaderboard()
+      setLeaderboard(Array.isArray(response) ? response : [])
+      if (!silent) setLeaderboardError('')
+    } catch (loadError) {
+      if (!silent) {
+        setLeaderboardError(getErrorMessage(loadError, '순위표를 불러오지 못했습니다.'))
+      }
+    }
+  }
+
   async function fetchState(roomCode, silent = false) {
     if (silent && (actionInFlightRef.current || cardSelectLockRef.current)) return null
 
@@ -288,6 +307,9 @@ export default function RoundsLiteArena({ controller }) {
       const response = await getRoundsLiteState(roomCode)
       if (silent && (actionInFlightRef.current || cardSelectLockRef.current)) return response
       setRoom(response)
+      if (response?.phase === 'MATCH_END') {
+        loadLeaderboard(true)
+      }
       setTick(Date.now())
       if (!silent) setError('')
       return response
@@ -606,6 +628,41 @@ export default function RoundsLiteArena({ controller }) {
                 <button type="button" className="rounds-lite-secondary" onClick={handleReset} disabled={!room || loading}>
                   매치 초기화
                 </button>
+              </div>
+            </section>
+
+            <section className="rounds-lite-card rounds-lite-ranking-card">
+              <div className="rounds-lite-ranking-head">
+                <div>
+                  <h2>주간 승리 순위</h2>
+                  <p>매주 월요일 00:00에 1위 보상 지급 후 초기화됩니다.</p>
+                </div>
+                <button type="button" className="rounds-lite-chip" onClick={() => loadLeaderboard(false)}>새로고침</button>
+              </div>
+
+              {leaderboardError && <p className="rounds-lite-message">{leaderboardError}</p>}
+
+              <div className="rounds-lite-ranking-table">
+                <div className="rounds-lite-ranking-row rounds-lite-ranking-row--head">
+                  <span>순위</span>
+                  <span>계정</span>
+                  <span>승리</span>
+                </div>
+
+                {leaderboard.length > 0 ? (
+                  leaderboard.map((item) => (
+                    <div key={`${item.rank}-${item.userId}`} className="rounds-lite-ranking-row">
+                      <span className="rounds-lite-ranking-rank">{item.rank}</span>
+                      <span>
+                        <strong>{item.name}</strong>
+                        <em>{item.role} · {item.rewardLabel}</em>
+                      </span>
+                      <span className="rounds-lite-ranking-wins">{item.weeklyWins}승</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounds-lite-ranking-empty">아직 이번 주 승리 기록이 없습니다.</div>
+                )}
               </div>
             </section>
 
