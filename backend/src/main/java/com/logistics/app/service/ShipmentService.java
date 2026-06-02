@@ -326,7 +326,8 @@ public class ShipmentService {
                 .build());
         Offer acceptedOffer = shipment.getAcceptedOfferId() != null ? offerRepository.findById(shipment.getAcceptedOfferId()).orElse(null) : null;
         User adminUser = userRepository.findAll().stream().filter(user -> user.getRole() == UserRole.ADMIN).findFirst().orElse(null);
-        financeService.settleCompletedShipment(shipment, acceptedOffer, adminUser);
+        boolean useDriverFeeCoupon = request != null && Boolean.TRUE.equals(request.getUseDriverFeeCoupon());
+        financeService.settleCompletedShipment(shipment, acceptedOffer, adminUser, useDriverFeeCoupon);
         logStatus(shipment, before, ShipmentStatus.COMPLETED, driver.getEmail(), "운송 완료");
         ShipmentDtos.ShipmentResponse response = toResponse(shipment, driver);
         realtimePublisher.publishShipmentUpdated(response);

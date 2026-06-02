@@ -125,7 +125,7 @@ public class FinanceService {
 
         Offer acceptedOffer = resolveAcceptedOffer(shipment);
         User adminUser = findAdminUser();
-        reconcileShipmentTransactions(shipment, acceptedOffer, adminUser);
+        reconcileShipmentTransactions(shipment, acceptedOffer, adminUser, false);
     }
 
     @Transactional
@@ -134,7 +134,16 @@ public class FinanceService {
             return;
         }
 
-        reconcileShipmentTransactions(shipment, acceptedOffer, adminUser);
+        reconcileShipmentTransactions(shipment, acceptedOffer, adminUser, false);
+    }
+
+    @Transactional
+    public void settleCompletedShipment(Shipment shipment, Offer acceptedOffer, User adminUser, boolean useDriverFeeCoupon) {
+        if (shipment == null) {
+            return;
+        }
+
+        reconcileShipmentTransactions(shipment, acceptedOffer, adminUser, useDriverFeeCoupon);
     }
 
     private void reconcileFinanceTransactionsSafely() {
@@ -193,7 +202,7 @@ public class FinanceService {
         return offerRepository.findById(shipment.getAcceptedOfferId()).orElse(null);
     }
 
-    private void reconcileShipmentTransactions(Shipment shipment, Offer acceptedOffer, User adminUser) {
+    private void reconcileShipmentTransactions(Shipment shipment, Offer acceptedOffer, User adminUser, boolean useDriverFeeCoupon) {
         if (shipment == null || shipment.getStatus() != ShipmentStatus.COMPLETED) {
             return;
         }
@@ -218,10 +227,13 @@ public class FinanceService {
                 driverFeeAmount = nvl(existingEarnTransactions.get(0).getFeeAmount());
                 netAmount = Math.max(grossAmount - driverFeeAmount, 0);
                 driverDescription = "운행 완료 정산 - 정산 수수료 50% 할인 쿠폰 적용";
-            } else if (!alreadySettled) {
+            } else if (!alreadySettled && useDriverFeeCoupon) {
                 User driver = shipment.getAssignedDriver();
                 int driverCoupons = driver.getDriverFeeCouponCount() == null ? 0 : driver.getDriverFeeCouponCount();
-                if (driverCoupons > 0 && feeAmount > 0) {
+                if (driverCoupons <= 0) {
+                    throw new RuntimeException("사용 가능한 정산 수수료 할인 쿠폰이 없습니다.");
+                }
+                if (feeAmount > 0) {
                     driverFeeAmount = (int) Math.floor(feeAmount * 0.5);
                     netAmount = Math.max(grossAmount - driverFeeAmount, 0);
                     driverDescription = "운행 완료 정산 - 정산 수수료 50% 할인 쿠폰 적용";

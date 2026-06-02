@@ -484,6 +484,7 @@ export function useLogisticsController() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState("REGISTERED");
   const [useDiscountCoupon, setUseDiscountCoupon] = useState(false);
+  const [useDriverFeeCoupon, setUseDriverFeeCoupon] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [assistantDraft, setAssistantDraft] = useState("");
   const [assistantSending, setAssistantSending] = useState(false);
@@ -1629,6 +1630,7 @@ export function useLogisticsController() {
 
       if (!file) {
         setCompletionProof({ dataUrl: "", name: "" });
+      setUseDriverFeeCoupon(false);
         return;
       }
 
@@ -2007,9 +2009,11 @@ export function useLogisticsController() {
       await completeTrip(selectedId, {
         completionImageDataUrl: completionProof.dataUrl,
         completionImageName: completionProof.name,
+        useDriverFeeCoupon,
       });
 
       setCompletionProof({ dataUrl: "", name: "" });
+      setUseDriverFeeCoupon(false);
 
       setMessage("운송이 완료되었습니다.");
 
@@ -2433,6 +2437,8 @@ export function useLogisticsController() {
     selectedPaymentMethod,
     useDiscountCoupon,
     setUseDiscountCoupon,
+    useDriverFeeCoupon,
+    setUseDriverFeeCoupon,
     unreadChatCount,
     notificationUnreadCount,
     shipments,

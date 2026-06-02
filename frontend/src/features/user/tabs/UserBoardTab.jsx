@@ -31,6 +31,9 @@ export default function UserBoardTab({ controller }) {
     handleCompletionProofChange,
     completionProof,
     handleComplete,
+    profile,
+    useDriverFeeCoupon,
+    setUseDriverFeeCoupon,
     page,
     setPage,
     totalPages,
@@ -667,6 +670,19 @@ export default function UserBoardTab({ controller }) {
                               />
                             </div>
                           )}
+
+                          <label className="coupon-option" style={{ marginTop: 12 }}>
+                            <input
+                              type="checkbox"
+                              checked={Boolean(useDriverFeeCoupon)}
+                              disabled={(profile?.driverFeeCouponCount || 0) <= 0}
+                              onChange={(event) => setUseDriverFeeCoupon(event.target.checked)}
+                            />
+                            <span>
+                              정산 수수료 50% 할인 쿠폰 사용
+                              <small>보유 {(profile?.driverFeeCouponCount || 0)}장 · 이번 운송 완료 정산에 적용</small>
+                            </span>
+                          </label>
                         </div>
 
                         <button
