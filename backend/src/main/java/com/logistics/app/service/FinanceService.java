@@ -177,6 +177,7 @@ public class FinanceService {
     }
 
     private void reconcileCompletedShipmentTransactions() {
+    	
         User adminUser = findAdminUser();
         List<Shipment> completedShipments = shipmentRepository.findAll().stream()
                 .filter(shipment -> shipment.getStatus() == ShipmentStatus.COMPLETED)
