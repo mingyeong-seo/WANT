@@ -35,7 +35,7 @@ export default function QuoteListPagination({
         onClick={handlePrev}
         disabled={currentPage === 1}
       >
-        ← 이전
+        ←
       </button>
 
       {pageNumbers.map((pageNumber) => (
@@ -57,7 +57,7 @@ export default function QuoteListPagination({
         onClick={handleNext}
         disabled={currentPage === totalPages}
       >
-        다음 →
+        →
       </button>
     </div>
   );

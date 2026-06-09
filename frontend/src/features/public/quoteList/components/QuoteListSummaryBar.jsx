@@ -1,15 +1,15 @@
 import SimpleSelect from "./SimpleSelect";
 
 const PAGE_SIZE_OPTIONS = [
-  { value: 10, label: "10개씩 보기" },
-  { value: 20, label: "20개씩 보기" },
-  { value: 30, label: "30개씩 보기" },
+  { value: 10, label: "10개씩" },
+  { value: 20, label: "20개씩" },
+  { value: 30, label: "30개씩" },
 ];
 
 const SORT_OPTIONS = [
-  { value: "최신 등록순", label: "최신 등록순" },
-  { value: "마감 임박순", label: "마감 임박순" },
-  { value: "높은 운임순", label: "높은 운임순" },
+  { value: "최신 등록순", label: "최신순" },
+  { value: "마감 임박순", label: "마감임박" },
+  { value: "높은 운임순", label: "운임높은순" },
 ];
 
 export default function QuoteListSummaryBar({
@@ -25,11 +25,11 @@ export default function QuoteListSummaryBar({
 }) {
   return (
     <section className="quote-list-summary-bar">
-      <div className="quote-list-summary-bar__left">
-        <strong>
-          전체 <span>{totalCount}건</span>
-        </strong>
+      <strong className="quote-list-summary-count">
+        전체 <span>{totalCount}건</span>
+      </strong>
 
+      <div className="quote-list-summary-controls">
         {isLoggedIn && isShipper && (
           <div className="quote-list-owner-toggle">
             <button
@@ -48,23 +48,23 @@ export default function QuoteListSummaryBar({
             </button>
           </div>
         )}
-      </div>
 
-      <div className="quote-list-summary-bar__right">
-        <div className="quote-list-size-select">
-          <SimpleSelect
-            value={pageSize}
-            options={PAGE_SIZE_OPTIONS}
-            onChange={(value) => onChangePageSize?.(Number(value))}
-          />
-        </div>
+        <div className="quote-list-select-controls">
+          <div className="quote-list-size-select">
+            <SimpleSelect
+              value={pageSize}
+              options={PAGE_SIZE_OPTIONS}
+              onChange={(value) => onChangePageSize?.(Number(value))}
+            />
+          </div>
 
-        <div className="quote-list-sort-select">
-          <SimpleSelect
-            value={sortOrder}
-            options={SORT_OPTIONS}
-            onChange={onChangeSortOrder}
-          />
+          <div className="quote-list-sort-select">
+            <SimpleSelect
+              value={sortOrder}
+              options={SORT_OPTIONS}
+              onChange={onChangeSortOrder}
+            />
+          </div>
         </div>
       </div>
     </section>
