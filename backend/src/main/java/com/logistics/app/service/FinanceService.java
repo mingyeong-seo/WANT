@@ -183,7 +183,7 @@ public class FinanceService {
                 .toList();
 
         for (Shipment shipment : completedShipments) {
-            reconcileShipmentTransactions(shipment, resolveAcceptedOffer(shipment), adminUser);
+            reconcileShipmentTransactions(shipment, resolveAcceptedOffer(shipment), adminUser, false);
         }
     }
 
