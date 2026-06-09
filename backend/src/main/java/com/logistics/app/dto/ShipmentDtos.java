@@ -72,6 +72,7 @@ public class ShipmentDtos {
     public static class CompleteShipmentRequest {
         @NotBlank private String completionImageDataUrl;
         private String completionImageName;
+        private Boolean useDriverFeeCoupon;
     }
 
     @Data

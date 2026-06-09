@@ -337,6 +337,9 @@ export default function TransportStatus({ controller }) {
     completionProof,
     handleCompletionProofChange,
     handleComplete,
+    profile,
+    useDriverFeeCoupon,
+    setUseDriverFeeCoupon,
     handleStart,
     openCancelModal,
     handleToggleBookmark,
@@ -871,6 +874,17 @@ export default function TransportStatus({ controller }) {
                               accept="image/*"
                               onChange={handleCompletionProofChange}
                             />
+                          </label>
+
+                          <label className="transport-couponOption">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(useDriverFeeCoupon)}
+                              disabled={(profile?.driverFeeCouponCount || 0) <= 0}
+                              onChange={(event) => setUseDriverFeeCoupon(event.target.checked)}
+                            />
+                            <span>정산 수수료 50% 할인 쿠폰 사용</span>
+                            <small>보유 {(profile?.driverFeeCouponCount || 0)}장</small>
                           </label>
                           <button
                             type="button"
