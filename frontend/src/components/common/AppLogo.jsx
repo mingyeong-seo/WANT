@@ -1,4 +1,4 @@
-import logo from '../../assets/want-logo.png'
+import logo from '../../assets/want-logo.webp'
 
 export default function AppLogo({
   title = 'want',
