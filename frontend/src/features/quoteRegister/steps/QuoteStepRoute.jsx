@@ -1,24 +1,34 @@
-import { useState } from "react";
 import AddressPanel from "../components/AddressPanel";
 import SchedulePanel from "../components/SchedulePanel";
 
 export default function QuoteStepRoute({
   formData = {},
   errors = {},
+  activePanel = null,
   updateField,
   setRouteAddress,
+  openPanel,
+  closePanel,
+  mobilePanelNoticeVisible = false,
+  mobilePanelNoticeTarget = "",
 }) {
-  const [activePanel, setActivePanel] = useState(null);
-
-  const openPanel = (panelName) => {
-    setActivePanel(panelName);
-  };
-
-  const closePanel = () => {
-    setActivePanel(null);
-  };
-
   if (!formData) return null;
+
+  const renderMobilePanelNotice = (target) => {
+    if (!mobilePanelNoticeVisible || mobilePanelNoticeTarget !== target) {
+      return null;
+    }
+
+    return (
+      <div
+        className="quote-register-mobile-panel-notice"
+        role="status"
+        aria-live="polite"
+      >
+        아래로 스크롤해서 입력 보조 패널을 확인하세요.
+      </div>
+    );
+  };
 
   const transportScheduleText =
     formData.transportDate && formData.transportTime
@@ -89,6 +99,8 @@ export default function QuoteStepRoute({
               </div>
             </button>
           </div>
+          {renderMobilePanelNotice("route-origin")}
+          {renderMobilePanelNotice("route-destination")}
 
           {errors?.originAddress && (
             <p className="error-text">{errors.originAddress}</p>
@@ -111,6 +123,7 @@ export default function QuoteStepRoute({
           >
             {transportScheduleText}
           </button>
+          {renderMobilePanelNotice("route-schedule")}
           {errors?.transportDate && (
             <p className="error-text">{errors.transportDate}</p>
           )}

@@ -10,6 +10,9 @@ export default function QuoteStepCargo({
   formData = {},
   errors = {},
   updateField,
+  onOpenAssistPanel,
+  mobilePanelNoticeVisible = false,
+  mobilePanelNoticeTarget = "",
 }) {
   const [assistPanelMode, setAssistPanelMode] = useState("guide");
   const [showVehicleTooltip, setShowVehicleTooltip] = useState(false);
@@ -35,14 +38,17 @@ export default function QuoteStepCargo({
   const openVehiclePanel = () => {
     if (formData.vehicleNeedConsult) return;
     setAssistPanelMode("vehicle");
+    onOpenAssistPanel?.("vehicle");
   };
 
   const openCargoTypePanel = () => {
     setAssistPanelMode("cargoType");
+    onOpenAssistPanel?.("cargoType");
   };
 
   const openImagePanel = () => {
     setAssistPanelMode("images");
+    onOpenAssistPanel?.("images");
   };
 
   const handleSelectVehicle = (vehicleLabel) => {
@@ -140,6 +146,22 @@ export default function QuoteStepCargo({
     ? formData.cargoImages.length
     : 0;
 
+  const renderMobilePanelNotice = (target) => {
+    if (!mobilePanelNoticeVisible || mobilePanelNoticeTarget !== target) {
+      return null;
+    }
+
+    return (
+      <div
+        className="quote-register-mobile-panel-notice"
+        role="status"
+        aria-live="polite"
+      >
+        아래로 스크롤해서 입력 보조 패널을 확인하세요.
+      </div>
+    );
+  };
+
   return (
     <section className="quote-step-layout">
       <div className="quote-step-layout__main">
@@ -176,6 +198,8 @@ export default function QuoteStepCargo({
                 : formData.vehicleType || "희망 차량을 선택해 주세요"}
             </button>
 
+            {renderMobilePanelNotice("cargo-vehicle")}
+
             {errors.vehicleType && !formData.vehicleNeedConsult && (
               <p className="error-text">{errors.vehicleType}</p>
             )}
@@ -197,6 +221,8 @@ export default function QuoteStepCargo({
             >
               {formData.cargoType || "화물 종류를 선택해 주세요"}
             </button>
+
+            {renderMobilePanelNotice("cargo-cargoType")}
 
             {errors.cargoType && (
               <p className="error-text">{errors.cargoType}</p>
@@ -321,6 +347,8 @@ export default function QuoteStepCargo({
           </div>
 
           {/* 희망 운임 */}
+          {renderMobilePanelNotice("cargo-images")}
+
           <div className="form-group form-group--with-option">
             <label htmlFor="desiredPrice">
               희망 운임 <span className="required-mark">*</span>

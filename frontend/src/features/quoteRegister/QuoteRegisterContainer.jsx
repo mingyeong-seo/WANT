@@ -6,8 +6,14 @@ import QuoteStepCargo from "./steps/QuoteStepCargo";
 import QuoteStepReview from "./steps/QuoteStepReview";
 import useQuoteRegisterForm from "./hooks/useQuoteRegisterForm";
 import { QUOTE_REGISTER_STEPS } from "./constants/quoteRegisterSteps";
+import { useEffect, useRef, useState } from "react";
 
 export default function QuoteRegisterContainer({ controller, onMoveToQuoteList }) {
+  const [mobilePanelNotice, setMobilePanelNotice] = useState({
+    visible: false,
+    target: "",
+  });
+  const mobilePanelNoticeTimerRef = useRef(null);
   const {
     currentStep,
     formData,
@@ -21,6 +27,38 @@ export default function QuoteRegisterContainer({ controller, onMoveToQuoteList }
     goNextStep,
     submitForm,
   } = useQuoteRegisterForm(controller);
+
+  const showMobilePanelNotice = (target) => {
+    if (
+      typeof window === "undefined" ||
+      !window.matchMedia("(max-width: 1024px)").matches
+    ) {
+      return;
+    }
+
+    if (mobilePanelNoticeTimerRef.current) {
+      window.clearTimeout(mobilePanelNoticeTimerRef.current);
+    }
+
+    setMobilePanelNotice({ visible: true, target });
+    mobilePanelNoticeTimerRef.current = window.setTimeout(() => {
+      setMobilePanelNotice({ visible: false, target: "" });
+      mobilePanelNoticeTimerRef.current = null;
+    }, 2800);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (mobilePanelNoticeTimerRef.current) {
+        window.clearTimeout(mobilePanelNoticeTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleOpenPanel = (panelName) => {
+    openPanel(panelName);
+    showMobilePanelNotice(`route-${panelName}`);
+  };
 
   const isRouteStepValid =
     !!(formData.estimateName || "").trim() &&
@@ -61,8 +99,10 @@ export default function QuoteRegisterContainer({ controller, onMoveToQuoteList }
         activePanel={activePanel}
         updateField={updateField}
         setRouteAddress={setRouteAddress}
-        openPanel={openPanel}
+        openPanel={handleOpenPanel}
         closePanel={closePanel}
+        mobilePanelNoticeVisible={mobilePanelNotice.visible}
+        mobilePanelNoticeTarget={mobilePanelNotice.target}
       />
     );
 
@@ -75,6 +115,11 @@ export default function QuoteRegisterContainer({ controller, onMoveToQuoteList }
         formData={formData}
         errors={errors}
         updateField={updateField}
+        onOpenAssistPanel={(panelName) =>
+          showMobilePanelNotice(`cargo-${panelName}`)
+        }
+        mobilePanelNoticeVisible={mobilePanelNotice.visible}
+        mobilePanelNoticeTarget={mobilePanelNotice.target}
       />
     );
 
@@ -93,6 +138,16 @@ export default function QuoteRegisterContainer({ controller, onMoveToQuoteList }
           steps={QUOTE_REGISTER_STEPS}
           currentStep={currentStep}
         />
+
+        {false && mobilePanelNotice.visible && (
+          <div
+            className="quote-register-mobile-panel-notice"
+            role="status"
+            aria-live="polite"
+          >
+            아래로 스크롤해서 입력 보조 패널을 확인하세요.
+          </div>
+        )}
 
         <div className="quote-register-body">{stepContent}</div>
 

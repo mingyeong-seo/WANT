@@ -5,6 +5,10 @@
   padding: 32px 20px;
 }
 
+.quote-register-mobile-panel-notice {
+  display: none;
+}
+
 .quote-register-shell {
   width: 100%;
   max-width: 1280px;
@@ -29,6 +33,7 @@
 .quote-register-body {
   margin-top: 24px;
 }
+
 
 /* Step 1, 2 공통 레이아웃
    - Step 1과 Step 2의 전체 감싸는 크기/비율을 동일하게 맞춤
@@ -338,6 +343,25 @@
   margin-top: 16px;
 }
 
+.daum-postcode-wrapper iframe {
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto;
+  touch-action: auto;
+}
+
+.mobile-postcode-open-button {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 12px;
+  background: #315efb;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .transport-date-group {
   margin-top: 24px;
 }
@@ -595,6 +619,26 @@
 
 /* 반응형 */
 @media (max-width: 1024px) {
+  .quote-register-mobile-panel-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 360px);
+    min-height: 44px;
+    margin: 10px 0 0;
+    padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 999px;
+    background: rgba(17, 24, 39, 0.94);
+    color: #ffffff;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.24);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    pointer-events: none;
+  }
+
   .quote-step-layout {
     grid-template-columns: 1fr;
     min-height: auto;
@@ -606,6 +650,23 @@
     padding-left: 0;
     padding-top: 20px;
     min-height: auto;
+  }
+
+  .address-panel-body {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .daum-postcode-wrapper {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: auto;
+    padding: 16px;
+    pointer-events: auto;
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 /* 중량: 숫자 input + 단위 select 한 줄 배치 */
@@ -1378,6 +1439,7 @@
   justify-content: center;
   align-items: flex-start;
 }
+
 
 /* STEP ITEM */
 .quote-stepper-item {

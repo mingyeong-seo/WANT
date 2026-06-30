@@ -68,13 +68,15 @@ export default function QuoteDetailCargoInfoCard({
         <div className="quote-detail-info-table__row">
           <div className="quote-detail-info-table__label">희망 운임</div>
           <div className="quote-detail-info-table__content">
-            <strong>{formatPrice(quote.desiredPrice)}</strong>
+            <div className="quote-detail-info-card__price-line">
+              <strong>{formatPrice(quote.desiredPrice)}</strong>
 
-            {quote.priceProposalAllowed && (
-              <span className="quote-detail-info-card__price-badge">
-                가격 상담 가능
-              </span>
-            )}
+              {quote.priceProposalAllowed && (
+                <span className="quote-detail-info-card__price-badge">
+                  가격 상담 가능
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

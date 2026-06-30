@@ -115,7 +115,7 @@ export default function QuoteCard({ quote, onClickDetail }) {
   const priceText = formatPrice(desiredPrice);
 
   return (
-    <article className="quote-card">
+    <article className="quote-card" data-quote-id={quote.id}>
       <div className="quote-card__main">
         <div className="quote-card__header">
           <div className="quote-card__badge-row">
