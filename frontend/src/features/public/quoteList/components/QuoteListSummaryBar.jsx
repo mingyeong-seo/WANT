@@ -16,6 +16,8 @@ export default function QuoteListSummaryBar({
   totalCount,
   ownerFilter,
   onChangeOwnerFilter,
+  excludeClosedQuotes,
+  onChangeExcludeClosedQuotes,
   pageSize,
   onChangePageSize,
   sortOrder,
@@ -30,6 +32,16 @@ export default function QuoteListSummaryBar({
       </strong>
 
       <div className="quote-list-summary-controls">
+        <button
+          type="button"
+          className={`quote-list-closed-filter ${
+            excludeClosedQuotes ? "is-active" : ""
+          }`}
+          onClick={() => onChangeExcludeClosedQuotes?.(!excludeClosedQuotes)}
+        >
+          진행중인 견적 보기
+        </button>
+
         {isLoggedIn && isShipper && (
           <div className="quote-list-owner-toggle">
             <button

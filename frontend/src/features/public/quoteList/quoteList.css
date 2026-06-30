@@ -173,6 +173,30 @@
   min-width: 0;
 }
 
+.quote-list-closed-filter {
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 0 16px;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.quote-list-closed-filter.is-active {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+}
+
 .quote-list-owner-toggle {
   display: flex;
   align-items: center;
@@ -334,8 +358,10 @@
 }
 
 .quote-card__badge-row {
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
 }
@@ -345,10 +371,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 24px;
-  padding: 4px 10px;
+  min-height: 26px;
+  padding: 5px 12px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1;
 }
@@ -2023,6 +2049,14 @@
     justify-content: stretch;
   }
 
+  .quote-list-closed-filter {
+    width: max-content;
+    max-width: 100%;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
   .quote-list-owner-toggle {
     width: 100%;
     min-width: 0;
@@ -2295,6 +2329,7 @@
   }
 
   .quote-list-summary-controls,
+  .quote-list-closed-filter,
   .quote-list-owner-toggle,
   .quote-list-select-controls {
     width: 100%;
@@ -2303,11 +2338,22 @@
   }
 
   .quote-list-summary-controls {
+    position: relative;
+    z-index: 30;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 4px;
+  }
+
+  .quote-list-closed-filter {
+    width: auto;
+    max-width: none;
+    height: 32px;
+    padding: 0 6px;
+    font-size: 10px;
+    letter-spacing: 0;
   }
 
   .quote-list-owner-toggle,
@@ -2318,55 +2364,74 @@
   }
 
   .quote-list-owner-toggle button {
-    height: 36px;
-    padding: 0 12px;
-    font-size: 12px;
+    height: 32px;
+    padding: 0 7px;
+    font-size: 10px;
   }
 
   .quote-list-select-controls {
-    display: grid;
-    grid-template-columns: 78px 92px;
-    justify-content: end;
-    gap: 6px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
     margin-left: auto;
+    position: relative;
+    z-index: 40;
   }
 
   .quote-list-owner-toggle {
     display: flex;
     flex-wrap: nowrap;
     justify-content: flex-start;
+    gap: 4px;
   }
 
   .quote-list-select-controls .simple-select {
-    width: 100%;
+    width: auto;
     min-width: 0;
     max-width: 100%;
+    position: relative;
+    z-index: 50;
   }
 
   .quote-list-select-controls .simple-select-trigger {
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    height: 36px;
-    padding: 0 10px;
-    font-size: 12px;
+    height: 32px;
+    padding: 0 7px;
+    font-size: 10px;
+    gap: 4px;
+    touch-action: manipulation;
+  }
+
+  .quote-list-size-select .simple-select-trigger {
+    width: 62px;
+  }
+
+  .quote-list-sort-select .simple-select-trigger {
+    width: 72px;
   }
 
   .simple-select-dropdown {
-    left: 0;
-    right: auto;
+    top: auto;
+    bottom: calc(100% + 6px);
+    left: auto;
+    right: 0;
     width: 100%;
-    min-width: 100%;
+    min-width: 96px;
     max-width: min(170px, calc(100vw - 40px));
+    z-index: 200;
   }
 
   .quote-list-sort-select .simple-select-dropdown {
-    left: 0;
-    right: auto;
+    right: 0;
+    min-width: 104px;
   }
 
   .simple-select-option {
-    white-space: normal;
+    padding: 10px 11px;
+    font-size: 12px;
+    white-space: nowrap;
     word-break: keep-all;
   }
 
@@ -2589,5 +2654,21 @@
 
   .quote-card__price {
     font-size: 27px;
+  }
+}
+
+.quote-card__status-badge,
+.quote-card__price-badge {
+  min-height: 26px;
+  padding: 5px 12px;
+  font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  .quote-card__status-badge,
+  .quote-card__price-badge {
+    min-height: 24px;
+    padding: 5px 10px;
+    font-size: 10px;
   }
 }

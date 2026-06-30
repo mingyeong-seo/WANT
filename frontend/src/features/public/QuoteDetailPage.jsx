@@ -59,7 +59,7 @@ export default function QuoteDetailPage({ controller, routeParams }) {
   const canEdit = isOwner && isBiddingStatus(quoteState?.status);
 
   const moveToQuoteList = () => {
-    controller.setRoutePage("quotes");
+    controller.setRoutePage("quotes", { returnQuoteId: quoteId });
   };
 
   const openBidModal = () => {

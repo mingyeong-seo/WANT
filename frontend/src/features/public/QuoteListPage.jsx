@@ -10,15 +10,42 @@ import QuoteListPagination from "./quoteList/components/QuoteListPagination";
 import { shipmentToQuote } from "./quoteUtils";
 
 const VISIBLE_QUOTE_STATUSES = ["입찰 진행중", "입찰 완료"];
+const CLOSED_QUOTE_STATUS = "입찰 완료";
+
+function isPastTransportDate(quote) {
+  const targetValue = quote?.scheduledStartAt || quote?.transportDate;
+
+  if (!targetValue) return false;
+
+  const target = new Date(targetValue);
+
+  if (Number.isNaN(target.getTime())) return false;
+
+  const today = new Date();
+  const todayStart = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+  const targetStart = new Date(
+    target.getFullYear(),
+    target.getMonth(),
+    target.getDate(),
+  );
+
+  return targetStart.getTime() < todayStart.getTime();
+}
 
 export default function QuoteListPage({ controller }) {
   const [status, setStatus] = useState("전체");
   const [origin, setOrigin] = useState("전체");
   const [destination, setDestination] = useState("전체");
   const [ownerFilter, setOwnerFilter] = useState("전체");
+  const [excludeClosedQuotes, setExcludeClosedQuotes] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortOrder, setSortOrder] = useState("최신 등록순");
+  const [restoredQuoteId, setRestoredQuoteId] = useState(null);
 
   const [loading] = useState(false);
   const [error] = useState("");
@@ -47,16 +74,28 @@ export default function QuoteListPage({ controller }) {
         destination === "전체" || quoteDestination.includes(destination);
       const matchOwner =
         ownerFilter === "전체" || (ownerFilter === "내 견적만" && isMine);
+      const matchClosed =
+        !excludeClosedQuotes ||
+        (quoteStatus !== CLOSED_QUOTE_STATUS && !isPastTransportDate(quote));
 
       return (
         matchVisibleStatus &&
         matchStatus &&
         matchOrigin &&
         matchDestination &&
-        matchOwner
+        matchOwner &&
+        matchClosed
       );
     });
-  }, [mappedQuotes, status, origin, destination, ownerFilter, profileId]);
+  }, [
+    mappedQuotes,
+    status,
+    origin,
+    destination,
+    ownerFilter,
+    profileId,
+    excludeClosedQuotes,
+  ]);
 
   const sortedQuotes = useMemo(() => {
     const copiedQuotes = [...filteredQuotes];
@@ -82,10 +121,19 @@ export default function QuoteListPage({ controller }) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [status, origin, destination, ownerFilter, pageSize, sortOrder]);
+  }, [
+    status,
+    origin,
+    destination,
+    ownerFilter,
+    excludeClosedQuotes,
+    pageSize,
+    sortOrder,
+  ]);
 
   const totalCount = sortedQuotes.length;
   const totalPages = Math.ceil(totalCount / pageSize);
+  const returnQuoteId = Number(controller.routeParams?.returnQuoteId);
 
   const paginatedQuotes = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
@@ -99,6 +147,44 @@ export default function QuoteListPage({ controller }) {
       setCurrentPage(totalPages);
     }
   }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    if (!returnQuoteId || restoredQuoteId === returnQuoteId) return;
+
+    const targetIndex = sortedQuotes.findIndex(
+      (quote) => Number(quote.id) === returnQuoteId,
+    );
+
+    if (targetIndex < 0) return;
+
+    const targetPage = Math.floor(targetIndex / pageSize) + 1;
+
+    if (currentPage !== targetPage) {
+      setCurrentPage(targetPage);
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      const targetCard = document.querySelector(
+        `[data-quote-id="${returnQuoteId}"]`,
+      );
+
+      targetCard?.scrollIntoView({
+        block: "center",
+        behavior: "smooth",
+      });
+
+      setRestoredQuoteId(returnQuoteId);
+      controller.setRoutePage("quotes");
+    });
+  }, [
+    returnQuoteId,
+    restoredQuoteId,
+    sortedQuotes,
+    pageSize,
+    currentPage,
+    controller,
+  ]);
 
   const headerContent = controller.isLoggedIn ? (
     controller.auth?.role === "DRIVER" ? (
@@ -156,6 +242,8 @@ export default function QuoteListPage({ controller }) {
           totalCount={totalCount}
           ownerFilter={ownerFilter}
           onChangeOwnerFilter={setOwnerFilter}
+          excludeClosedQuotes={excludeClosedQuotes}
+          onChangeExcludeClosedQuotes={setExcludeClosedQuotes}
           pageSize={pageSize}
           onChangePageSize={setPageSize}
           sortOrder={sortOrder}

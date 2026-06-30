@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import DaumPostcode from "react-daum-postcode";
+import DaumPostcode, { useKakaoPostcodePopup } from "react-daum-postcode";
 
 const KAKAO_APP_KEY = import.meta.env.VITE_KAKAO_MAP_APP_KEY || "";
 
@@ -47,12 +47,14 @@ export default function AddressPanel({
   const [floor, setFloor] = useState("");
   const [hasElevator, setHasElevator] = useState("");
   const [isClient, setIsClient] = useState(false);
+  const [isMobilePostcode, setIsMobilePostcode] = useState(false);
   const [resolvedCoords, setResolvedCoords] = useState({
     lat: null,
     lng: null,
   });
 
   const mountedRef = useRef(false);
+  const openPostcodePopup = useKakaoPostcodePopup();
 
   useEffect(() => {
     mountedRef.current = true;
@@ -60,6 +62,29 @@ export default function AddressPanel({
 
     return () => {
       mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const mediaQuery = window.matchMedia("(max-width: 1024px)");
+    const updateMobilePostcode = () => {
+      setIsMobilePostcode(mediaQuery.matches);
+    };
+
+    updateMobilePostcode();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updateMobilePostcode);
+      return () => {
+        mediaQuery.removeEventListener("change", updateMobilePostcode);
+      };
+    }
+
+    mediaQuery.addListener(updateMobilePostcode);
+    return () => {
+      mediaQuery.removeListener(updateMobilePostcode);
     };
   }, []);
 
@@ -219,6 +244,14 @@ export default function AddressPanel({
     setPanelStep("search");
   };
 
+  const handleOpenPostcodePopup = () => {
+    openPostcodePopup({
+      onComplete: handleComplete,
+      autoClose: true,
+      popupTitle: "주소 검색",
+    });
+  };
+
   const baseAddressText = selectedBaseAddress || currentValue || "";
 
   return (
@@ -245,7 +278,17 @@ export default function AddressPanel({
           )}
 
           <div className="daum-postcode-wrapper">
-            {isClient ? (
+            {isClient && isMobilePostcode ? (
+              <button
+                type="button"
+                className="mobile-postcode-open-button"
+                onClick={handleOpenPostcodePopup}
+              >
+                주소 검색하기
+              </button>
+            ) : null}
+
+            {isClient && !isMobilePostcode ? (
               <DaumPostcode
                 key={`${fieldName}-postcode`}
                 onComplete={handleComplete}
