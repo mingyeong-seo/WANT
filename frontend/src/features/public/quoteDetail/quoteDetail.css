@@ -392,9 +392,15 @@
   line-height: 1.6;
 }
 
+.quote-detail-info-card__price-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .quote-detail-info-card__price-badge {
   display: inline-flex;
-  align-self: flex-start;
   align-items: center;
   justify-content: center;
   min-height: 28px;

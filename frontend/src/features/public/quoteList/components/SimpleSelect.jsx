@@ -34,6 +34,18 @@ export default function SimpleSelect({
     setOpen(false);
   };
 
+  const handleOptionPointerDown = (event, optionValue) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleSelect(optionValue);
+  };
+
+  const handleTriggerPointerDown = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setOpen((prev) => !prev);
+  };
+
   const selectedOption = options.find((option) => option.value === value);
 
   return (
@@ -41,7 +53,7 @@ export default function SimpleSelect({
       <button
         type="button"
         className="simple-select-trigger"
-        onClick={() => setOpen((prev) => !prev)}
+        onPointerDown={handleTriggerPointerDown}
       >
         <span className="simple-select-label">
           {selectedOption ? selectedOption.label : ""}
@@ -58,7 +70,9 @@ export default function SimpleSelect({
               className={`simple-select-option ${
                 value === option.value ? "active" : ""
               }`}
-              onClick={() => handleSelect(option.value)}
+              onPointerDown={(event) =>
+                handleOptionPointerDown(event, option.value)
+              }
             >
               {option.label}
             </button>
