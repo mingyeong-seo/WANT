@@ -1,36 +1,95 @@
-import ChatFloatingButton from "./components/common/ChatFloatingButton";
-import ChatInboxPanel from "./components/common/ChatInboxPanel";
-import NotificationPanel from "./components/common/NotificationPanel";
-import PaymentModal from "./components/common/PaymentModal";
-import ChatWindowModal from "./components/common/ChatWindowModal";
-import UserProfileModal from "./components/common/UserProfileModal";
-import AssistantWindowModal from "./components/common/AssistantWindowModal";
-import ScrollTopFloatingButton from "./components/common/ScrollTopFloatingButton";
-import AdminConsolePage from "./features/admin/AdminConsolePage";
-import MessagesPage from "./features/chat/MessagesPage";
-import NotificationsPage from "./features/chat/NotificationsPage";
-import RoundsLiteArena from "./features/game/RoundsLiteArena";
-import QuoteListPage from "./features/public/QuoteListPage";
-import QuoteRegisterPage from "./features/public/QuoteRegisterPage";
-import PublicHomePage from "./features/public/PublicHomePage";
-import PublicUserSearchPage from "./features/public/users/PublicUserSearchPage";
-import UserConsolePage from "./features/user/UserConsolePage";
 import { useLogisticsController } from "./hooks/useLogisticsController";
-import DriverSignupPage from "./pages/DriverSignupForm";
-import ShipperSignupPage from "./pages/ShipperSignupForm";
-import TransportStatus from "./pages/TransportStatus";
-import PaymentPage from "./pages/PaymentPage";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ReceiptPdfBridge from "./components/common/ReceiptPdfBridge";
-import QuoteDetailPage from "./features/public/QuoteDetailPage";
 // 추가
-import React, { useEffect } from "react";
-import PublicFooter from "./features/public/components/publicFooter/PublicFooter";
+import React, { Suspense, useEffect } from "react";
+
+const AdminConsolePage = React.lazy(() => import("./features/admin/AdminConsolePage"));
+const AssistantWindowModal = React.lazy(() => import("./components/common/AssistantWindowModal"));
+const ChatFloatingButton = React.lazy(() => import("./components/common/ChatFloatingButton"));
+const ChatInboxPanel = React.lazy(() => import("./components/common/ChatInboxPanel"));
+const ChatWindowModal = React.lazy(() => import("./components/common/ChatWindowModal"));
+const DriverSignupPage = React.lazy(() => import("./pages/DriverSignupForm"));
+const ForgotPasswordPage = React.lazy(() => import("./pages/ForgotPasswordPage"));
+const LoginPage = React.lazy(() => import("./pages/LoginPage"));
+const MessagesPage = React.lazy(() => import("./features/chat/MessagesPage"));
+const NotificationPanel = React.lazy(() => import("./components/common/NotificationPanel"));
+const NotificationsPage = React.lazy(() => import("./features/chat/NotificationsPage"));
+const PaymentModal = React.lazy(() => import("./components/common/PaymentModal"));
+const PaymentPage = React.lazy(() => import("./pages/PaymentPage"));
+const PublicFooter = React.lazy(() => import("./features/public/components/publicFooter/PublicFooter"));
+const PublicHomePage = React.lazy(() => import("./features/public/PublicHomePage"));
+const PublicUserSearchPage = React.lazy(() => import("./features/public/users/PublicUserSearchPage"));
+const QuoteDetailPage = React.lazy(() => import("./features/public/QuoteDetailPage"));
+const QuoteListPage = React.lazy(() => import("./features/public/QuoteListPage"));
+const QuoteRegisterPage = React.lazy(() => import("./features/public/QuoteRegisterPage"));
+const ReceiptPdfBridge = React.lazy(() => import("./components/common/ReceiptPdfBridge"));
+const RoundsLiteArena = React.lazy(() => import("./features/game/RoundsLiteArena"));
+const ScrollTopFloatingButton = React.lazy(() => import("./components/common/ScrollTopFloatingButton"));
+const ShipperSignupPage = React.lazy(() => import("./pages/ShipperSignupForm"));
+const SignupPage = React.lazy(() => import("./pages/SignupPage"));
+const TransportStatus = React.lazy(() => import("./pages/TransportStatus"));
+const UserConsolePage = React.lazy(() => import("./features/user/UserConsolePage"));
+const UserProfileModal = React.lazy(() => import("./components/common/UserProfileModal"));
+
+const LANDING_STYLE_ROUTES = new Set([
+  "main",
+  "quotes",
+  "detail",
+  "register",
+  "quoteRegister",
+  "shippers",
+  "drivers",
+]);
+
+const AUTH_STYLE_ROUTES = new Set([
+  "login",
+  "signup",
+  "signup-shipper",
+  "signup-driver",
+  "forgot-password",
+]);
+
+function useRouteStyles(controller) {
+  useEffect(() => {
+    if (controller.routePage === "status") {
+      import("./styles/transport-status.css");
+    }
+
+    if (
+      LANDING_STYLE_ROUTES.has(controller.routePage) ||
+      AUTH_STYLE_ROUTES.has(controller.routePage) ||
+      controller.dashboardTab === "home"
+    ) {
+      import("./styles/landing.css");
+    }
+
+    if (
+      controller.routePage === "dashboard" ||
+      controller.isAdmin ||
+      (!LANDING_STYLE_ROUTES.has(controller.routePage) &&
+        !AUTH_STYLE_ROUTES.has(controller.routePage) &&
+        controller.routePage !== "status")
+    ) {
+      import("./styles/console.css");
+    }
+
+    if (
+      controller.routePage === "messages" ||
+      controller.routePage === "notifications" ||
+      (controller.isLoggedIn && !controller.isAdmin)
+    ) {
+      import("./styles/chat.css");
+    }
+  }, [
+    controller.dashboardTab,
+    controller.isAdmin,
+    controller.isLoggedIn,
+    controller.routePage,
+  ]);
+}
 
 export default function App() {
   const controller = useLogisticsController();
+  useRouteStyles(controller);
 
   const hasReceiptPdfQuery =
     typeof window !== "undefined" &&
@@ -47,7 +106,11 @@ export default function App() {
   }, []);
 
   if (hasReceiptPdfQuery) {
-    return <ReceiptPdfBridge />;
+    return (
+      <Suspense fallback={null}>
+        <ReceiptPdfBridge />
+      </Suspense>
+    );
   }
 
   let page = null;
@@ -106,7 +169,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <Suspense fallback={null}>
       {page}
 
       {controller.profileModalOpen && (
@@ -187,6 +250,6 @@ export default function App() {
       )}
 
       {controller.routePage !== "dashboard" && <PublicFooter />}
-    </>
+    </Suspense>
   );
 }
